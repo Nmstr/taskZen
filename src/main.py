@@ -12,10 +12,11 @@ def main():
     parser = argparse.ArgumentParser(prog='taskZen', description='Automation utility for Wayland')
     subparsers = parser.add_subparsers(dest='command')
 
-    parser_add = subparsers.add_parser('execute', help='Execute a script')
-    parser_add.add_argument('name', help='name of the script to execute')
+    parserAdd = subparsers.add_parser('execute', help='Execute a script')
+    parserAdd.add_argument('name', help='name of the script to execute')
+    parserAdd.add_argument('-f', '--file', action='store_true', help='Use file path instead of name')
 
-    parser_list = subparsers.add_parser('list', aliases=['ls'], help='list all connections')
+    parserList = subparsers.add_parser('list', aliases=['ls'], help='list all connections')
 
     args = parser.parse_args()
 
@@ -26,9 +27,14 @@ def main():
 
     elif args.command in ['execute']:
         print(f'Executing {args.name}')
+        if args.file:
+            scriptPath = args.name
+        else: 
+            scriptPath = findScript(args.name)
 
-        # Find the script
-        scriptPath = findScript(args.name)        
+        if scriptPath is None or not os.path.exists(scriptPath):
+            print(f'Script {args.name} not found')
+            exit(1)
 
         # Initialize the input device and load data
         scriptData = readScript(scriptPath)
