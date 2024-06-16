@@ -1,4 +1,4 @@
-name: test
+name: exampleKeyboard
 speed: 100
 keys: 
   - KEY_LEFTSHIFT

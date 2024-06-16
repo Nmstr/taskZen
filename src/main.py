@@ -8,6 +8,7 @@ allKeys, data, ui = initialize()
 executionSpeed = data['speed']
 # Execute the steps
 for step in data['steps']:
+    print(step)
     if step['type'] == 'wait':
         time.sleep(step['value'] / 1000)
 
@@ -32,8 +33,13 @@ for step in data['steps']:
         ui.syn()
 
     elif step['type'] == 'move-absolute':
-        ui.write(e.EV_ABS, e.ABS_X, step['valueX'])
-        ui.write(e.EV_ABS, e.ABS_Y, step['valueY'])
+        ui.write(e.EV_ABS, e.ABS_X, step['x'])
+        ui.write(e.EV_ABS, e.ABS_Y, step['y'])
+        ui.syn()
+    
+    elif step['type'] == 'move-relative':
+        ui.write(e.EV_REL, e.REL_X, step['x'])
+        ui.write(e.EV_REL, e.REL_Y, step['y'])
         ui.syn()
 
     time.sleep(executionSpeed / 1000)

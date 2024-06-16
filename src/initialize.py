@@ -12,7 +12,7 @@ def initialize():
             allKeys[values] = key
         
     # Open the YAML file and load the data
-    with open("example.yaml", "r") as file:
+    with open("examples/exampleKeyboard.yaml", "r") as file:
         data = yaml.safe_load(file)
 
     # Create the key list
@@ -27,6 +27,10 @@ def initialize():
         e.EV_ABS: [
             (e.ABS_X, AbsInfo(value=0, min=0, max=1920, fuzz=0, flat=0, resolution=0)),
             (e.ABS_Y, AbsInfo(value=0, min=0, max=1080, fuzz=0, flat=0, resolution=0)),
+        ],
+        e.EV_REL: [
+            (e.REL_X),
+            (e.REL_Y),
         ],
     }
 
