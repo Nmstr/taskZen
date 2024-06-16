@@ -1,4 +1,5 @@
 from evdev import ecodes as e
+import subprocess
 import time
 
 def execute(scriptData, ui, allKeys):
@@ -38,6 +39,14 @@ def execute(scriptData, ui, allKeys):
             ui.write(e.EV_REL, e.REL_X, step['x'])
             ui.write(e.EV_REL, e.REL_Y, step['y'])
             ui.syn()
+
+        elif step['type'] == 'exec':
+            blocking = step.get('blocking', False)
+            print(step['value'].split())
+            if blocking:
+                subprocess.call(step['value'].split())
+            else:
+                subprocess.Popen(step['value'].split())
 
         time.sleep(executionSpeed / 1000)
 

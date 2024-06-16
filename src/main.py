@@ -49,7 +49,7 @@ def main():
         for file in os.listdir(scriptDir):
             with open(scriptDir + file, 'r') as f:
                 scriptData = yaml.safe_load(f)
-            print(f'\t- {scriptData["name"]} ({os.path.abspath(scriptDir + file)})')
+            print(f'\t- {scriptData['name']} ({os.path.abspath(scriptDir + file)})')
 
 if __name__ == '__main__':
     main()

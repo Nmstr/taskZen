@@ -1,0 +1,11 @@
+name: exampleExec
+speed: 100
+keys:
+  - KEY_ENTER
+screen:
+  width: 1920
+  height: 1080
+
+steps:
+  - type: exec
+    value: notify-send "Example"
