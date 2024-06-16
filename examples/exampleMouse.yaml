@@ -2,6 +2,9 @@ name: exampleMouse
 speed: 100
 keys: 
   - BTN_MOUSE
+screen:
+  width: 1920
+  height: 1080
 
 steps:
   - type: wait

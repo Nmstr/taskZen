@@ -12,6 +12,9 @@ keys:
   - KEY_W
   - KEY_R
   - KEY_D
+screen:
+  width: 1920
+  height: 1080
 
 steps:
   - type: tap

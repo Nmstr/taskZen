@@ -1,13 +1,14 @@
+from initialize import initialize, readScript
 from evdev import ecodes as e
 import time
 
 # Initialize the input device and load data
-from initialize import initialize
-allKeys, data, ui = initialize()
+scriptData = readScript('examples/exampleMouse.yaml')
+allKeys, ui = initialize(scriptData)
 
-executionSpeed = data['speed']
+executionSpeed = scriptData['speed']
 # Execute the steps
-for step in data['steps']:
+for step in scriptData['steps']:
     print(step)
     if step['type'] == 'wait':
         time.sleep(step['value'] / 1000)
