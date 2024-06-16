@@ -1,40 +1,13 @@
-from evdev import UInput, ecodes as e, AbsInfo
+from evdev import ecodes as e
 import time
-import yaml
 
-# Create the allKeys dictionary
-allKeys = {}
-for key, values in e.keys.items():
-    if isinstance(values, list):
-        for value in values:
-            allKeys[value] = key
-    else:
-        allKeys[values] = key
-    
-# Open the YAML file and load the data
-with open("example.yaml", "r") as file:
-    data = yaml.safe_load(file)
-
-# Create the key list
-keyList = []
-for key in data['keys']:
-    number = allKeys.get(key)
-    keyList.append(number)
-
-cap = {
-    e.EV_KEY: keyList,
-    e.EV_ABS: [
-        (e.ABS_X, AbsInfo(value=0, min=0, max=1920, fuzz=0, flat=0, resolution=0)),
-        (e.ABS_Y, AbsInfo(value=0, min=0, max=1080, fuzz=0, flat=0, resolution=0)),
-    ],
-}
-
-# Create the virtual input device with absolute positioning
-ui = UInput(cap, name='virtual-input-device', version=0x3)
+# Initialize the input device and load data
+from initialize import initialize
+allKeys, data, ui = initialize()
 
 executionSpeed = data['speed']
+# Execute the steps
 for step in data['steps']:
-    print(step)
     if step['type'] == 'wait':
         time.sleep(step['value'] / 1000)
 
