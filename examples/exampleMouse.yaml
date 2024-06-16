@@ -1,0 +1,42 @@
+name: exampleMouse
+speed: 100
+keys: 
+  - BTN_MOUSE
+screen:
+  width: 1920
+  height: 1080
+
+steps:
+  - type: wait
+    value: 500
+
+  - type: move-absolute
+    x: 500
+    y: 500
+
+  - type: wait
+    value: 500
+
+  - type: move-relative
+    x: 100
+    y: 50
+  - type: wait
+    value: 100
+  - type: move-relative
+    x: 100
+    y: 50
+  - type: wait
+    value: 100
+  - type: move-relative
+    x: 100
+    y: 50
+  - type: wait
+    value: 100
+  - type: move-relative
+    x: 100
+    y: 50
+  - type: wait
+    value: 100
+  - type: move-relative
+    x: 100
+    y: 50
