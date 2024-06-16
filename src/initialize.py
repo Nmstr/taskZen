@@ -1,5 +1,6 @@
 from evdev import UInput, ecodes as e, AbsInfo
 import yaml
+import os
 
 def initialize(scriptData: dict):
     # Create the allKeys dictionary
@@ -52,3 +53,20 @@ def readScript(scriptPath: str = "examples/exampleKeyboard.yaml"):
         scriptData = yaml.safe_load(file)
     
     return scriptData
+
+def findScript(scriptName: str):
+    """
+    Finds the file path for any given script
+
+    Parameters:
+        - scriptName (str): The name of the script
+
+    Returns:
+        - scriptPath (str): The path to the script
+    """
+    scriptDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/'
+    for script in os.listdir(scriptDir):
+        with open(scriptDir + script, 'r') as file:
+            data = yaml.safe_load(file)
+            if data['name'] == scriptName:
+                return scriptDir + script
