@@ -33,7 +33,7 @@ def main():
             scriptPath = findScript(args.name)
 
         if scriptPath is None or not os.path.exists(scriptPath):
-            print(f'Script {args.name} not found')
+            print(f'Script {args.name} not found.')
             exit(1)
 
         # Initialize the input device and load data
