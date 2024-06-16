@@ -39,15 +39,15 @@ Prerequisites: Make sure you have Python, pip, and git installed on your system.
 
 `pip install -r requirements.txt`
 
-4. Put the program into your path
+4. (Optional) Put the program into your path
 
 `sudo ln -s /path/to/current/dir/run.sh /usr/local/bin/taskZen`
 
-4. Run the program
+5. (Optional) Run the program
 
 `taskZen`
 
-5. (Optional) Clone the example scripts into the scripts directory
+6. (Optional) Clone the example scripts into the scripts directory
 
 `cp -r ../examples/* ~/.config/taskZen/`
 
