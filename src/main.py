@@ -1,5 +1,5 @@
 from initialize import initialize, readScript, findScript
-from executer import execute
+from executer import Executer
 import argparse
 import yaml
 import os
@@ -42,7 +42,8 @@ def main():
         scriptData = readScript(scriptPath)
         allKeys, ui = initialize(scriptData)
         
-        execute(scriptData, ui, allKeys)
+        executer = Executer(ui, allKeys)
+        executer.execute(scriptData)
 
     elif args.command in ['list', 'ls']:
         # List all scripts
