@@ -3,8 +3,8 @@ import subprocess
 import time
 
 class Executer:
-    def __init__(self, scriptData, ui, allKeys):
-        self.scriptData = scriptData
+    def __init__(self, ui, allKeys):
+        self.scriptData = None
         self.ui = ui
         self.allKeys = allKeys
 
@@ -44,7 +44,12 @@ class Executer:
         else:
             subprocess.Popen(command)
 
-    def execute(self):
+    def execute(self, scriptData):
+        self.scriptData = scriptData
+        if not self.scriptData:
+            print("Error: No script data")
+            return
+
         executionSpeed = self.scriptData['speed']
         for step in self.scriptData['steps']:
             print(step)

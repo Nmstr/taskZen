@@ -42,8 +42,8 @@ def main():
         scriptData = readScript(scriptPath)
         allKeys, ui = initialize(scriptData)
         
-        executer = Executer(scriptData, ui, allKeys)
-        executer.execute()
+        executer = Executer(ui, allKeys)
+        executer.execute(scriptData)
 
     elif args.command in ['list', 'ls']:
         # List all scripts
