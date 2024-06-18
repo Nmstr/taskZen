@@ -70,3 +70,18 @@ def findScript(scriptName: str):
             data = yaml.safe_load(file)
             if data['name'] == scriptName:
                 return scriptDir + script
+
+def scriptContainsExec(scriptData: dict) -> bool:
+    """
+    Checks if the script contains an exec command
+    
+    Parameters:
+        - scriptData (dict): The script data
+    
+    Returns:
+        - bool: Whether the script contains an exec command
+    """
+    for step in scriptData['steps']:
+        if step['type'] == 'exec':
+            return True
+    return False

@@ -1,4 +1,4 @@
-from initialize import initialize, readScript, findScript
+from initialize import initialize, readScript, findScript, scriptContainsExec
 from executer import Executer
 import argparse
 import yaml
@@ -16,10 +16,9 @@ def main():
     parserAdd.add_argument('name', help='name of the script to execute')
     parserAdd.add_argument('-f', '--file', action='store_true', help='Use file path instead of name')
     parserAdd.add_argument('-v', '--verbose', action='store_true', help='Make the output verbose')
+    parserAdd.add_argument('-y', '--yes', action='store_true', help='Answer yes to all prompts')
 
     parserList = subparsers.add_parser('list', aliases=['ls'], help='list all connections')
-
-    parserVerify = subparsers.add_parser('verify', aliases=['lint'], help='Verify validity of a script')
 
     args = parser.parse_args()
 
@@ -39,8 +38,18 @@ def main():
             print(f'Script {args.name} not found.')
             exit(1)
 
-        # Initialize the input device and load data
+        # Load the data
         scriptData = readScript(scriptPath)
+        if scriptContainsExec(scriptData):
+            print('Script contains an exec command. Are you sure you want to execute it?')
+            print('These scripts may be unsafe. Use it at your own risk.')
+            if not args.yes:
+                result = input('Type "YES" to continue: ')
+                if result != 'YES':
+                    print('Aborting.')
+                    exit(1)
+
+        # Initialize the input device
         allKeys, ui = initialize(scriptData)
         
         executer = Executer(ui=ui, allKeys=allKeys, verbose=args.verbose)
