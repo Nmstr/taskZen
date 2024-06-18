@@ -15,6 +15,7 @@ def main():
     parserAdd = subparsers.add_parser('execute', help='Execute a script')
     parserAdd.add_argument('name', help='name of the script to execute')
     parserAdd.add_argument('-f', '--file', action='store_true', help='Use file path instead of name')
+    parserAdd.add_argument('-v', '--verbose', action='store_true', help='Make the output verbose')
 
     parserList = subparsers.add_parser('list', aliases=['ls'], help='list all connections')
 
@@ -42,7 +43,7 @@ def main():
         scriptData = readScript(scriptPath)
         allKeys, ui = initialize(scriptData)
         
-        executer = Executer(ui, allKeys)
+        executer = Executer(ui=ui, allKeys=allKeys, verbose=args.verbose)
         executer.execute(scriptData)
 
     elif args.command in ['list', 'ls']:
