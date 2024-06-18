@@ -3,17 +3,19 @@ import subprocess
 import time
 
 class Executer:
-    def __init__(self, ui, allKeys: dict) -> None:
+    def __init__(self, ui, allKeys: dict, verbose: bool = False) -> None:
         """
         Initialize the executer
         
         Parameters:
             - ui (UInput): The UInput object
             - allKeys (dict): The dictionary of all keys
+            - verbose (bool, optional): Whether to print verbose output. Defaults to False.
         """
         self.scriptData = None
         self.ui = ui
         self.allKeys = allKeys
+        self.verbose = verbose
 
     def actionWait(self, sleepTime: int) -> None:
         """
@@ -112,7 +114,8 @@ class Executer:
 
         executionSpeed = self.scriptData['speed']
         for step in self.scriptData['steps']:
-            print(step)
+            if self.verbose:
+                print(step)
             if step['type'] == 'wait':
                 self.actionWait(step['value'])
             elif step['type'] == 'press':
