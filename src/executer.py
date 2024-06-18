@@ -116,6 +116,15 @@ class Executer:
         for step in self.scriptData['steps']:
             if self.verbose:
                 print(step)
+            
+            self.executeIteration(step)
+
+            time.sleep(executionSpeed / 1000)
+
+        time.sleep(0.1) # Let the device process the events
+        self.ui.close()
+
+    def executeIteration(self, step: dict) -> None:
             if step['type'] == 'wait':
                 self.actionWait(step['value'])
             elif step['type'] == 'press':
@@ -130,8 +139,9 @@ class Executer:
                 self.actionMoveRelative(step['x'], step['y'])
             elif step['type'] == 'exec':
                 self.actionExec(step['value'].split(), step.get('blocking', False))
-
-            time.sleep(executionSpeed / 1000)
-
-        time.sleep(0.1) # Let the device process the events
-        self.ui.close()
+            elif step['type'] == 'loop':
+                for _ in range(step['value']):
+                    for subStep in step['subSteps']:
+                        if self.verbose:
+                            print('->', subStep)
+                        self.executeIteration(subStep)
