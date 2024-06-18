@@ -20,8 +20,6 @@ def main():
 
     parserList = subparsers.add_parser('list', aliases=['ls'], help='list all connections')
 
-    parserVerify = subparsers.add_parser('verify', aliases=['lint'], help='Verify validity of a script')
-
     args = parser.parse_args()
 
     if args.command is None:
