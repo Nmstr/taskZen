@@ -2,54 +2,68 @@ from evdev import ecodes as e
 import subprocess
 import time
 
-def execute(scriptData, ui, allKeys):
-    executionSpeed = scriptData['speed']
-    # Execute the steps
-    for step in scriptData['steps']:
-        print(step)
-        if step['type'] == 'wait':
-            time.sleep(step['value'] / 1000)
+class Executer:
+    def __init__(self, scriptData, ui, allKeys):
+        self.scriptData = scriptData
+        self.ui = ui
+        self.allKeys = allKeys
 
-        elif step['type'] == 'press':
-            ui.write(e.EV_KEY, allKeys.get(step['value']), 1)
-            ui.syn()
+    def actionWait(self, sleepTime):
+        time.sleep(sleepTime / 1000)
 
-        elif step['type'] == 'release':
-            ui.write(e.EV_KEY, allKeys.get(step['value']), 0)
-            ui.syn()
+    def actionPressKey(self, key):
+        self.ui.write(e.EV_KEY, self.allKeys.get(key), 1)
+        self.ui.syn()
 
-        elif step['type'] == 'tap':
-            modifier = step.get('modifier', None)
-            if modifier == 'SHIFT':
-                ui.write(e.EV_KEY, e.KEY_LEFTSHIFT, 1)
-                ui.write(e.EV_KEY, allKeys.get(step['value']), 1)
-                ui.write(e.EV_KEY, allKeys.get(step['value']), 0)
-                ui.write(e.EV_KEY, e.KEY_LEFTSHIFT, 0)
-            else:
-                ui.write(e.EV_KEY, allKeys.get(step['value']), 1)
-                ui.write(e.EV_KEY, allKeys.get(step['value']), 0)
-            ui.syn()
+    def actionReleaseKey(self, key):
+        self.ui.write(e.EV_KEY, self.allKeys.get(key), 0)
+        self.ui.syn()
 
-        elif step['type'] == 'move-absolute':
-            ui.write(e.EV_ABS, e.ABS_X, step['x'])
-            ui.write(e.EV_ABS, e.ABS_Y, step['y'])
-            ui.syn()
-        
-        elif step['type'] == 'move-relative':
-            ui.write(e.EV_REL, e.REL_X, step['x'])
-            ui.write(e.EV_REL, e.REL_Y, step['y'])
-            ui.syn()
+    def actionTapKey(self, key, modifier=None):
+        if modifier == 'SHIFT':
+            self.ui.write(e.EV_KEY, e.KEY_LEFTSHIFT, 1)
+        self.ui.write(e.EV_KEY, self.allKeys.get(key), 1)
+        self.ui.write(e.EV_KEY, self.allKeys.get(key), 0)
+        if modifier == 'SHIFT':
+            self.ui.write(e.EV_KEY, e.KEY_LEFTSHIFT, 0)
+        self.ui.syn()
+    
+    def actionMoveAbsolute(self, x, y):
+        self.ui.write(e.EV_ABS, e.ABS_X, x)
+        self.ui.write(e.EV_ABS, e.ABS_Y, y)
+        self.ui.syn()
 
-        elif step['type'] == 'exec':
-            blocking = step.get('blocking', False)
-            print(step['value'].split())
-            if blocking:
-                subprocess.call(step['value'].split())
-            else:
-                subprocess.Popen(step['value'].split())
+    def actionMoveRelative(self, x, y):
+        self.ui.write(e.EV_REL, e.REL_X, x)
+        self.ui.write(e.EV_REL, e.REL_Y, y)
+        self.ui.syn()
+    
+    def actionExec(self, command, blocking=False):
+        if blocking:
+            subprocess.call(command)
+        else:
+            subprocess.Popen(command)
 
-        time.sleep(executionSpeed / 1000)
+    def execute(self):
+        executionSpeed = self.scriptData['speed']
+        for step in self.scriptData['steps']:
+            print(step)
+            if step['type'] == 'wait':
+                self.actionWait(step['value'])
+            elif step['type'] == 'press':
+                self.actionPressKey(step['value'])
+            elif step['type'] == 'release':
+                self.actionReleaseKey(step['value'])
+            elif step['type'] == 'tap':
+                self.actionTapKey(step['value'], step.get('modifier', None))
+            elif step['type'] == 'move-absolute':
+                self.actionMoveAbsolute(step['x'], step['y'])
+            elif step['type'] == 'move-relative':
+                self.actionMoveRelative(step['x'], step['y'])
+            elif step['type'] == 'exec':
+                self.actionExec(step['value'].split(), step.get('blocking', False))
 
-    # Close the device when done
-    time.sleep(0.1) # Let the device process the events
-    ui.close()
+            time.sleep(executionSpeed / 1000)
+
+        time.sleep(0.1) # Let the device process the events
+        self.ui.close()
