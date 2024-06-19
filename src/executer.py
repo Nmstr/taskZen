@@ -117,6 +117,29 @@ class Executer:
         else:
             subprocess.Popen(command)
 
+    def modifyVariable(self, variable: str, operation: str, value) -> None:
+        """
+        Modify a variable
+        
+        Parameters:
+            - variable (str): The variable to modify
+            - operation (str): The operation to perform
+            - value (any): The value to set
+        """
+        if operation == 'set':
+            self.variableData[variable] = self.retrieveValue(value)
+        elif operation == 'add':
+            self.variableData[variable] += self.retrieveValue(value)
+        elif operation == 'subtract':
+            self.variableData[variable] -= self.retrieveValue(value)
+        elif operation == 'multiply':
+            self.variableData[variable] *= self.retrieveValue(value)
+        elif operation == 'divide':
+            self.variableData[variable] /= self.retrieveValue(value)
+            
+        if self.verbose:
+            print(f'Variable Modified: {variable} {operation} {value}')
+
     def execute(self, scriptData: dict) -> None:
         """
         Execute the script
@@ -159,6 +182,8 @@ class Executer:
                 self.actionMoveRelative(step['x'], step['y'])
             elif step['type'] == 'exec':
                 self.actionExec(step['value'].split(), step.get('blocking', False))
+            elif step['type'] == 'modify-variable':
+                self.modifyVariable(step['variable'], step['operation'], step['value'])
             elif step['type'] == 'loop':
                 for _ in range(step['value']):
                     for subStep in step['subSteps']:
@@ -178,6 +203,8 @@ class Executer:
         """
         if value == None:
             return None
+        if not isinstance(value, str):
+            return value
         if value.startswith('$'):
             if self.verbose:
                 print(f'Variable -> {value}: {self.variableData.get(value[1:])}')
