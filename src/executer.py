@@ -124,7 +124,12 @@ class Executer:
         Parameters:
             - variable (str): The variable to modify
             - operation (str): The operation to perform
-            - value (any): The value to set
+                - set
+                - add
+                - subtract
+                - multiply
+                - divide
+            - value (any): The value to use for the operation
         """
         if operation == 'set':
             self.variableData[variable] = self.retrieveValue(value)
@@ -136,7 +141,7 @@ class Executer:
             self.variableData[variable] *= self.retrieveValue(value)
         elif operation == 'divide':
             self.variableData[variable] /= self.retrieveValue(value)
-            
+
         if self.verbose:
             print(f'Variable Modified: {variable} {operation} {value}')
 

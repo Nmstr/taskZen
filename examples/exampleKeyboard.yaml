@@ -21,7 +21,7 @@ steps:
     value: KEY_LEFTMETA
 
   - type: wait
-    value: 100
+    value: 250
 
   - type: tap
     value: KEY_H
