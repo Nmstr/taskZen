@@ -179,5 +179,7 @@ class Executer:
         if value == None:
             return None
         if value.startswith('$'):
+            if self.verbose:
+                print(f'Variable -> {value}: {self.variableData.get(value[1:])}')
             return self.variableData.get(value[1:])
         return value
