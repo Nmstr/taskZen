@@ -16,6 +16,7 @@ class Executer:
         self.ui = ui
         self.allKeys = allKeys
         self.verbose = verbose
+        self.executionSpeed = None
 
     def actionWait(self, sleepTime: int) -> None:
         """
@@ -24,6 +25,7 @@ class Executer:
         Parameters:
             - sleepTime (int): The amount of time to sleep in milliseconds
         """
+        sleepTime = self.retrieveValue(sleepTime)
         time.sleep(sleepTime / 1000)
 
     def actionPressKey(self, key: str) -> None:
@@ -33,6 +35,8 @@ class Executer:
         Parameters:
             - key (str): The key to press
         """
+        key = self.retrieveValue(key)
+
         self.ui.write(e.EV_KEY, self.allKeys.get(key), 1)
         self.ui.syn()
 
@@ -43,6 +47,8 @@ class Executer:
         Parameters:
             - key (str): The key to release
         """
+        key = self.retrieveValue(key)
+
         self.ui.write(e.EV_KEY, self.allKeys.get(key), 1)
         self.ui.write(e.EV_KEY, self.allKeys.get(key), 0)
         self.ui.syn()
@@ -55,6 +61,9 @@ class Executer:
             - key (str): The key to tap
             - modifier (str, optional): The modifier to use. Defaults to None.
         """
+        key = self.retrieveValue(key)
+        modifier = self.retrieveValue(modifier)
+
         if modifier == 'SHIFT':
             self.ui.write(e.EV_KEY, e.KEY_LEFTSHIFT, 1)
         self.ui.write(e.EV_KEY, self.allKeys.get(key), 1)
@@ -71,6 +80,9 @@ class Executer:
             - x (int): The x coordinate
             - y (int): The y coordinate
         """
+        x = self.retrieveValue(x)
+        y = self.retrieveValue(y)
+
         self.ui.write(e.EV_ABS, e.ABS_X, x)
         self.ui.write(e.EV_ABS, e.ABS_Y, y)
         self.ui.syn()
@@ -83,6 +95,9 @@ class Executer:
             - x (int): The x coordinate
             - y (int): The y coordinate
         """
+        x = self.retrieveValue(x)
+        y = self.retrieveValue(y)
+
         self.ui.write(e.EV_REL, e.REL_X, x)
         self.ui.write(e.EV_REL, e.REL_Y, y)
         self.ui.syn()
@@ -95,10 +110,41 @@ class Executer:
             - command (list): The command to execute
             - blocking (bool, optional): Whether to block the thread. Defaults to False.
         """
+        command = self.retrieveValue(command)
+        blocking = self.retrieveValue(blocking)
+
         if blocking:
             subprocess.call(command)
         else:
             subprocess.Popen(command)
+
+    def modifyVariable(self, variable: str, operation: str, value) -> None:
+        """
+        Modify a variable
+        
+        Parameters:
+            - variable (str): The variable to modify
+            - operation (str): The operation to perform
+                - set
+                - add
+                - subtract
+                - multiply
+                - divide
+            - value (any): The value to use for the operation
+        """
+        if operation == 'set':
+            self.variableData[variable] = self.retrieveValue(value)
+        elif operation == 'add':
+            self.variableData[variable] += self.retrieveValue(value)
+        elif operation == 'subtract':
+            self.variableData[variable] -= self.retrieveValue(value)
+        elif operation == 'multiply':
+            self.variableData[variable] *= self.retrieveValue(value)
+        elif operation == 'divide':
+            self.variableData[variable] /= self.retrieveValue(value)
+
+        if self.verbose:
+            print(f'Variable Modified: {variable} {operation} {value} -> {self.variableData[variable]}')
 
     def execute(self, scriptData: dict) -> None:
         """
@@ -107,19 +153,20 @@ class Executer:
         Parameters:
             - scriptData (dict): The script data
         """
+        # Load the script
         self.scriptData = scriptData
         if not self.scriptData:
             print("Error: No script data")
             return
+        self.executionSpeed = self.scriptData['speed']
+        self.variableData = self.scriptData['variables']
 
-        executionSpeed = self.scriptData['speed']
+        # Execute the script
         for step in self.scriptData['steps']:
             if self.verbose:
                 print(step)
             
             self.executeIteration(step)
-
-            time.sleep(executionSpeed / 1000)
 
         time.sleep(0.1) # Let the device process the events
         self.ui.close()
@@ -139,9 +186,41 @@ class Executer:
                 self.actionMoveRelative(step['x'], step['y'])
             elif step['type'] == 'exec':
                 self.actionExec(step['value'].split(), step.get('blocking', False))
+            elif step['type'] == 'modify-variable':
+                self.modifyVariable(step['variable'], step['operation'], step['value'])
             elif step['type'] == 'loop':
-                for _ in range(step['value']):
+                for _ in range(self.retrieveValue(step['value'])):
                     for subStep in step['subSteps']:
                         if self.verbose:
                             print('->', subStep)
                         self.executeIteration(subStep)
+
+            time.sleep(self.executionSpeed / 1000)
+
+    def retrieveValue(self, value):
+        """
+        Checks if a value is a variable and if so retrieves the value. If not, it returns the value as is.
+        
+        Parameters:
+            - value (any): The value to retrieve
+
+        Returns:
+            - The retrieved value (any)
+        """
+
+        if value == None:
+            return None
+        if not isinstance(value, str):
+            return value
+        
+        if value.startswith('$'):
+            if self.verbose:
+                print(f'Variable -> {value}: {self.variableData.get(value[1:])}')
+            return self.variableData.get(value[1:])
+        
+        elif value.startswith('-$'): # Invert variable
+            if self.verbose:
+                print(f'Variable -> {value[1:]}: {-self.variableData.get(value[2:])}')
+            return -self.variableData.get(value[2:])
+        
+        return value
