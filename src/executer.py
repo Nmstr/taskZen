@@ -16,6 +16,7 @@ class Executer:
         self.ui = ui
         self.allKeys = allKeys
         self.verbose = verbose
+        self.executionSpeed = None
 
     def actionWait(self, sleepTime: int) -> None:
         """
@@ -143,7 +144,7 @@ class Executer:
             self.variableData[variable] /= self.retrieveValue(value)
 
         if self.verbose:
-            print(f'Variable Modified: {variable} {operation} {value}')
+            print(f'Variable Modified: {variable} {operation} {value} -> {self.variableData[variable]}')
 
     def execute(self, scriptData: dict) -> None:
         """
@@ -157,7 +158,7 @@ class Executer:
         if not self.scriptData:
             print("Error: No script data")
             return
-        executionSpeed = self.scriptData['speed']
+        self.executionSpeed = self.scriptData['speed']
         self.variableData = self.scriptData['variables']
 
         # Execute the script
@@ -166,8 +167,6 @@ class Executer:
                 print(step)
             
             self.executeIteration(step)
-
-            time.sleep(executionSpeed / 1000)
 
         time.sleep(0.1) # Let the device process the events
         self.ui.close()
@@ -190,11 +189,13 @@ class Executer:
             elif step['type'] == 'modify-variable':
                 self.modifyVariable(step['variable'], step['operation'], step['value'])
             elif step['type'] == 'loop':
-                for _ in range(step['value']):
+                for _ in range(self.retrieveValue(step['value'])):
                     for subStep in step['subSteps']:
                         if self.verbose:
                             print('->', subStep)
                         self.executeIteration(subStep)
+
+            time.sleep(self.executionSpeed / 1000)
 
     def retrieveValue(self, value):
         """
@@ -206,12 +207,20 @@ class Executer:
         Returns:
             - The retrieved value (any)
         """
+
         if value == None:
             return None
         if not isinstance(value, str):
             return value
+        
         if value.startswith('$'):
             if self.verbose:
                 print(f'Variable -> {value}: {self.variableData.get(value[1:])}')
             return self.variableData.get(value[1:])
+        
+        elif value.startswith('-$'): # Invert variable
+            if self.verbose:
+                print(f'Variable -> {value[1:]}: {-self.variableData.get(value[2:])}')
+            return -self.variableData.get(value[2:])
+        
         return value

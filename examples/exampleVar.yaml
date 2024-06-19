@@ -1,29 +1,48 @@
 name: exampleVar
-speed: 100
+speed: 8
 keys: 
   - BTN_MOUSE
 screen:
   width: 1920
   height: 1080
 variables:
-  distance: 10
+  distance: 1
+  startPositionX: 50
+  startPositionY: 300
+  iterations: 3
 
 steps:
   - type: move-absolute
-    x: 75
-    y: 150
-  - type: wait
-    value: 500
+    x: $startPositionX
+    y: $startPositionY
 
   - type: loop
-    value: 25
+    value: $iterations
     subSteps:
-      - type: move-relative
-        x: $distance
-        y: 0
-      - type: wait
-        value: 100
-      - type: modify-variable
-        variable: distance
-        operation: add
-        value: 10
+    - type: loop
+      value: 10
+      subSteps:
+        - type: modify-variable
+          variable: distance
+          operation: add
+          value: 1
+        - type: loop
+          value: 16
+          subSteps:
+          - type: move-relative
+            x: $distance
+            y: 0
+
+    - type: loop
+      value: 10
+      subSteps:
+        - type: loop
+          value: 16
+          subSteps:
+          - type: move-relative
+            x: -$distance
+            y: 0
+        - type: modify-variable
+          variable: distance
+          operation: subtract
+          value: 1
