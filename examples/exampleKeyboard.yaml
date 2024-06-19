@@ -15,13 +15,15 @@ keys:
 screen:
   width: 1920
   height: 1080
+variables:
+  waitTime: 100
 
 steps:
   - type: tap
     value: KEY_LEFTMETA
 
   - type: wait
-    value: 250
+    value: $waitTime
 
   - type: tap
     value: KEY_H

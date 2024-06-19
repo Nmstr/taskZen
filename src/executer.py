@@ -24,6 +24,7 @@ class Executer:
         Parameters:
             - sleepTime (int): The amount of time to sleep in milliseconds
         """
+        sleepTime = self.retrieveValue(sleepTime)
         time.sleep(sleepTime / 1000)
 
     def actionPressKey(self, key: str) -> None:
@@ -33,6 +34,8 @@ class Executer:
         Parameters:
             - key (str): The key to press
         """
+        key = self.retrieveValue(key)
+
         self.ui.write(e.EV_KEY, self.allKeys.get(key), 1)
         self.ui.syn()
 
@@ -43,6 +46,8 @@ class Executer:
         Parameters:
             - key (str): The key to release
         """
+        key = self.retrieveValue(key)
+
         self.ui.write(e.EV_KEY, self.allKeys.get(key), 1)
         self.ui.write(e.EV_KEY, self.allKeys.get(key), 0)
         self.ui.syn()
@@ -55,6 +60,9 @@ class Executer:
             - key (str): The key to tap
             - modifier (str, optional): The modifier to use. Defaults to None.
         """
+        key = self.retrieveValue(key)
+        modifier = self.retrieveValue(modifier)
+
         if modifier == 'SHIFT':
             self.ui.write(e.EV_KEY, e.KEY_LEFTSHIFT, 1)
         self.ui.write(e.EV_KEY, self.allKeys.get(key), 1)
@@ -71,6 +79,9 @@ class Executer:
             - x (int): The x coordinate
             - y (int): The y coordinate
         """
+        x = self.retrieveValue(x)
+        y = self.retrieveValue(y)
+
         self.ui.write(e.EV_ABS, e.ABS_X, x)
         self.ui.write(e.EV_ABS, e.ABS_Y, y)
         self.ui.syn()
@@ -83,6 +94,9 @@ class Executer:
             - x (int): The x coordinate
             - y (int): The y coordinate
         """
+        x = self.retrieveValue(x)
+        y = self.retrieveValue(y)
+
         self.ui.write(e.EV_REL, e.REL_X, x)
         self.ui.write(e.EV_REL, e.REL_Y, y)
         self.ui.syn()
@@ -95,6 +109,9 @@ class Executer:
             - command (list): The command to execute
             - blocking (bool, optional): Whether to block the thread. Defaults to False.
         """
+        command = self.retrieveValue(command)
+        blocking = self.retrieveValue(blocking)
+
         if blocking:
             subprocess.call(command)
         else:
@@ -107,12 +124,15 @@ class Executer:
         Parameters:
             - scriptData (dict): The script data
         """
+        # Load the script
         self.scriptData = scriptData
         if not self.scriptData:
             print("Error: No script data")
             return
-
         executionSpeed = self.scriptData['speed']
+        self.variableData = self.scriptData['variables']
+
+        # Execute the script
         for step in self.scriptData['steps']:
             if self.verbose:
                 print(step)
@@ -145,3 +165,19 @@ class Executer:
                         if self.verbose:
                             print('->', subStep)
                         self.executeIteration(subStep)
+
+    def retrieveValue(self, value):
+        """
+        Checks if a value is a variable and if so retrieves the value. If not, it returns the value as is.
+        
+        Parameters:
+            - value (any): The value to retrieve
+
+        Returns:
+            - The retrieved value (any)
+        """
+        if value == None:
+            return None
+        if value.startswith('$'):
+            return self.variableData.get(value[1:])
+        return value
