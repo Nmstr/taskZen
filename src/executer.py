@@ -159,7 +159,8 @@ class Executer:
             print("Error: No script data")
             return
         self.executionSpeed = self.scriptData['speed']
-        self.variableData = self.scriptData['variables']
+        if 'variables' in self.scriptData:
+            self.variableData = self.scriptData['variables']
 
         # Execute the script
         for step in self.scriptData['steps']:
