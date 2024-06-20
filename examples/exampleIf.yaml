@@ -1,80 +1,60 @@
 name: exampleIf
-speed: 100
+speed: 0
 keys: 
-  - KEY_LEFTSHIFT
-  - KEY_LEFTMETA
-  - KEY_SPACE
-  - KEY_1
-  - KEY_H
-  - KEY_E
-  - KEY_L
-  - KEY_O
-  - KEY_W
-  - KEY_R
-  - KEY_D
+  - BTN_MOUSE
 screen:
   width: 1920
   height: 1080
 variables:
-  test: 10
+  distance: 2
+  xPos: 50
 
 steps:
-  - type: tap
-    value: KEY_LEFTMETA
+  - type: move-absolute
+    x: 50
+    y: 300
 
-  - type: wait
-    value: 250
-
-  - type: tap
-    value: KEY_H
-    modifier: SHIFT
-  
-  - type: tap
-    value: KEY_E
-
-  - type: tap
-    value: KEY_L
-
-  - type: tap
-    value: KEY_L
-
-  - type: tap
-    value: KEY_O
-
-  - type: if
-    operation: bool
-    value1: true
+  - type: loop
+    value: 35
     subSteps:
-    - type: tap
-      value: KEY_SPACE
-
-    - type: tap
-      value: KEY_W
-      modifier: SHIFT
-
-    - type: tap
-      value: KEY_O
-
-    - type: tap
-      value: KEY_R
-
-    - type: tap
-      value: KEY_L
-
-    - type: tap
-      value: KEY_D
-
-    - type: tap
-      value: KEY_1
-      modifier: SHIFT
 
     - type: loop
-      value: 10
+      value: 200
       subSteps:
-        - type: if
-          operation: "=="
-          value1: $test
-          value2: 10
-          subSteps:
-            - type: tap
-              value: KEY_1
+      - type: if
+        operation: "<"
+        value1: $xPos
+        value2: 960
+        subSteps:
+        - type: modify-variable
+          variable: xPos
+          operation: add
+          value: $distance
+        - type: move-relative
+          x: $distance
+          y: 0
+        - type: wait
+          value: 20
+
+    - type: loop
+      value: 200
+      subSteps:
+      - type: if
+        operation: ">="
+        value1: $xPos
+        value2: 500
+        subSteps:
+        - type: modify-variable
+          variable: xPos
+          operation: subtract
+          value: $distance
+        - type: move-relative
+          x: -$distance
+          y: 0
+        - type: wait
+          value: 20
+    
+    - type: modify-variable
+      variable: distance
+      operation: add
+      value: 2

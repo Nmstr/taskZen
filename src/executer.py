@@ -229,7 +229,7 @@ class Executer:
             value2 = self.retrieveValue(value2)
             
         if self.verbose:
-            print(f'Condition: {operation} {value1} ({type(value1)}) {value2} ({type(value2)})')
+            print(f'Condition: {value1} ({type(value1)}) {operation} {value2} ({type(value2)})')
 
         # Evaluate condition
         if operation == 'bool':
