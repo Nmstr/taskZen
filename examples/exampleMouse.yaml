@@ -1,5 +1,5 @@
 name: exampleMouse
-speed: 100
+speed: 1
 keys: 
   - BTN_MOUSE
 screen:

@@ -73,7 +73,7 @@ def findScript(scriptName: str):
 
 def scriptContainsExec(scriptData: dict) -> bool:
     """
-    Checks if the script contains an exec command
+    Checks if the script contains an exec command, including within loops
     
     Parameters:
         - scriptData (dict): The script data
@@ -81,7 +81,13 @@ def scriptContainsExec(scriptData: dict) -> bool:
     Returns:
         - bool: Whether the script contains an exec command
     """
-    for step in scriptData['steps']:
-        if step['type'] == 'exec':
-            return True
-    return False
+    def containsExec(steps):
+        for step in steps:
+            if step['type'] == 'exec':
+                return True
+            elif step['type'] == 'loop' and 'subSteps' in step:
+                if containsExec(step['subSteps']):
+                    return True
+        return False
+
+    return containsExec(scriptData.get('steps', []))
