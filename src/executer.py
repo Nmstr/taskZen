@@ -118,7 +118,7 @@ class Executer:
         else:
             subprocess.Popen(command)
 
-    def modifyVariable(self, variable: str, operation: str, value) -> None:
+    def actionModifyVariable(self, variable: str, operation: str, value) -> None:
         """
         Modify a variable
         
@@ -188,7 +188,7 @@ class Executer:
             elif step['type'] == 'exec':
                 self.actionExec(step['value'].split(), step.get('blocking', False))
             elif step['type'] == 'modify-variable':
-                self.modifyVariable(step['variable'], step['operation'], step['value'])
+                self.actionModifyVariable(step['variable'], step['operation'], step['value'])
             elif step['type'] == 'loop':
                 for _ in range(self.retrieveValue(step['value'])):
                     for subStep in step['subSteps']:
