@@ -195,8 +195,27 @@ class Executer:
                         if self.verbose:
                             print('->', subStep)
                         self.executeIteration(subStep)
+            elif step['type'] == 'if':
+                if self.evaluateCondition(step['operation'], step['value1'], step.get('value2', None)):
+                    for subStep in step['subSteps']:
+                        if self.verbose:
+                            print('->', subStep)
+                        self.executeIteration(subStep)
 
             time.sleep(self.executionSpeed / 1000)
+
+    def evaluateCondition(self, operation: str, value1, value2 = None) -> bool:
+        # Retrieve values
+        value1 = self.retrieveValue(value1)
+        if value2 is not None:
+            value2 = self.retrieveValue(value2)
+            
+        # Evaluate condition
+        if operation == 'bool':
+            if value1 is True:
+                return True
+            else:
+                return False    
 
     def retrieveValue(self, value):
         """
