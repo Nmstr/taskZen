@@ -65,3 +65,6 @@ steps:
     - type: tap
       value: KEY_1
       modifier: SHIFT
+
+    - type: exec
+      value: echo "Hello World!"
