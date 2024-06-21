@@ -34,7 +34,7 @@ def initialize(scriptData: dict):
     }
 
     # Create the virtual input device with absolute positioning
-    ui = UInput(cap, name='virtual-input-device', version=0x3)
+    ui = UInput(cap, name='taskZen-virtual-input-device', phys='taskZen-virtual-input-device')
 
     return allKeys, ui
 
