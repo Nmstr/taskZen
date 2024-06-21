@@ -195,8 +195,69 @@ class Executer:
                         if self.verbose:
                             print('->', subStep)
                         self.executeIteration(subStep)
+            elif step['type'] == 'if':
+                if self.evaluateCondition(step['operation'], step['value1'], step.get('value2', None)):
+                    if 'trueSteps' not in step: # If there are no true steps, return
+                        return
+                    for subStep in step['trueSteps']:
+                        if self.verbose:
+                            print('->', subStep)
+                        self.executeIteration(subStep)
+                else:
+                    if 'falseSteps' not in step: # If there are no true steps, return
+                        return
+                    for subStep in step['falseSteps']:
+                        if self.verbose:
+                            print('->', subStep)
+                        self.executeIteration(subStep)
 
             time.sleep(self.executionSpeed / 1000)
+
+    def evaluateCondition(self, operation: str, value1, value2 = None) -> bool:
+        """
+        Evaluate a condition
+        
+        Parameters:
+            - operation (str): The operation to perform
+                - bool (checks if bool is true)
+                - ==
+                - !=
+                - >
+                - <
+                - >=
+                - <=
+            - value1 (any): The first value
+            - value2 (any, optional): The second value. Defaults to None.
+
+        Returns:
+            - The result of the evaluation
+        """
+        # Retrieve values
+        value1 = self.retrieveValue(value1)
+        if value2 is not None:
+            value2 = self.retrieveValue(value2)
+            
+        if self.verbose:
+            print(f'Condition: {value1} ({type(value1)}) {operation} {value2} ({type(value2)})')
+
+        # Evaluate condition
+        if operation == 'bool':
+            if value1 is True:
+                return True
+            else:
+                return False
+        elif operation == '==':
+            return value1 == value2
+        elif operation == '!=':
+            return value1 != value2
+        elif operation == '>':
+            return value1 > value2
+        elif operation == '<':
+            return value1 < value2
+        elif operation == '>=':
+            return value1 >= value2
+        elif operation == '<=':
+            return value1 <= value2
 
     def retrieveValue(self, value):
         """
