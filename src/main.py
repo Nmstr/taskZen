@@ -40,19 +40,23 @@ def main():
 
         # Load the data
         scriptData = readScript(scriptPath)
+        
+        allowExec = False
         if scriptContainsExec(scriptData):
             print('Script contains an exec command. Are you sure you want to execute it?')
             print('These scripts may be unsafe. Use it at your own risk.')
             if not args.yes:
                 result = input('Type "YES" to continue: ')
-                if result != 'YES':
+                if result == 'YES':
+                    allowExec = True
+                else:
                     print('Aborting.')
                     exit(1)
 
         # Initialize the input device
         allKeys, ui = initialize(scriptData)
         
-        executer = Executer(ui=ui, allKeys=allKeys, verbose=args.verbose)
+        executer = Executer(ui=ui, allKeys=allKeys, verbose=args.verbose, allowExec=allowExec)
         executer.execute(scriptData)
 
     elif args.command in ['list', 'ls']:

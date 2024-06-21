@@ -3,7 +3,7 @@ import subprocess
 import time
 
 class Executer:
-    def __init__(self, ui, allKeys: dict, verbose: bool = False) -> None:
+    def __init__(self, *, ui, allKeys: dict, verbose: bool = False, allowExec: bool = False) -> None:
         """
         Initialize the executer
         
@@ -16,6 +16,7 @@ class Executer:
         self.ui = ui
         self.allKeys = allKeys
         self.verbose = verbose
+        self.allowExec = allowExec
         self.executionSpeed = None
 
     def actionWait(self, sleepTime: int) -> None:
@@ -186,7 +187,8 @@ class Executer:
             elif step['type'] == 'move-relative':
                 self.actionMoveRelative(step['x'], step['y'])
             elif step['type'] == 'exec':
-                self.actionExec(step['value'].split(), step.get('blocking', False))
+                if self.allowExec:
+                    self.actionExec(step['value'].split(), step.get('blocking', False))
             elif step['type'] == 'modify-variable':
                 self.actionModifyVariable(step['variable'], step['operation'], step['value'])
             elif step['type'] == 'loop':
