@@ -40,7 +40,7 @@ def main():
 
         # Load the data
         scriptData = readScript(scriptPath)
-        
+
         allowExec = False
         if scriptContainsExec(scriptData):
             print('Script contains an exec command. Are you sure you want to execute it?')
@@ -52,6 +52,8 @@ def main():
                 else:
                     print('Aborting.')
                     exit(1)
+            else:
+                allowExec = True
 
         # Initialize the input device
         allKeys, ui = initialize(scriptData)
