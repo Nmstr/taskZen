@@ -197,7 +197,16 @@ class Executer:
                         self.executeIteration(subStep)
             elif step['type'] == 'if':
                 if self.evaluateCondition(step['operation'], step['value1'], step.get('value2', None)):
-                    for subStep in step['subSteps']:
+                    if 'trueSteps' not in step: # If there are no true steps, return
+                        return
+                    for subStep in step['trueSteps']:
+                        if self.verbose:
+                            print('->', subStep)
+                        self.executeIteration(subStep)
+                else:
+                    if 'falseSteps' not in step: # If there are no true steps, return
+                        return
+                    for subStep in step['falseSteps']:
                         if self.verbose:
                             print('->', subStep)
                         self.executeIteration(subStep)

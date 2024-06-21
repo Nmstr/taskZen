@@ -25,7 +25,7 @@ steps:
         operation: "<"
         value1: $xPos
         value2: 960
-        subSteps:
+        trueSteps:
         - type: modify-variable
           variable: xPos
           operation: add
@@ -43,7 +43,7 @@ steps:
         operation: ">="
         value1: $xPos
         value2: 500
-        subSteps:
+        trueSteps:
         - type: modify-variable
           variable: xPos
           operation: subtract
