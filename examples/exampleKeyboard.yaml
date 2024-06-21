@@ -61,28 +61,3 @@ steps:
   - type: tap
     value: KEY_1
     modifier: SHIFT
-
-  - type: if
-    operation: bool
-    value1: True
-    trueSteps:
-      - type: loop
-        value: 1
-        subSteps:
-          - type: if
-            operation: bool
-            value1: False
-            trueSteps:
-              - type: tap
-                value: KEY_1
-                modifier: SHIFT
-            falseSteps:
-              - type: loop
-                value: 1
-                subSteps:
-                  - type: if
-                    operation: bool
-                    value1: False
-                    falseSteps:
-                      - type: exec
-                        value: 'echo Hello World!'
