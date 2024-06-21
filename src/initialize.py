@@ -88,9 +88,15 @@ def scriptContainsExec(scriptData: dict) -> bool:
             elif step['type'] == 'loop' and 'subSteps' in step:
                 if containsExec(step['subSteps']):
                     return True
-            elif step['type'] == 'if' and 'subSteps' in step:
-                if containsExec(step['subSteps']):
+            elif step['type'] == 'if' and 'trueSteps' in step and 'falseSteps' in step:
+                if containsExec(step['trueSteps']) or containsExec(step['falseSteps']):
                     return True
+            elif step['type'] == 'if' and 'trueSteps' in step:
+                if containsExec(step['trueSteps']):
+                    return True
+            elif step['type'] == 'if' and 'falseSteps' in step:
+                if containsExec(step['falseSteps']):
+                    return True                
         return False
 
     return containsExec(scriptData.get('steps', []))
