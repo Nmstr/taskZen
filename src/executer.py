@@ -171,7 +171,7 @@ class Executer:
             self.executeIteration(step)
 
         time.sleep(0.1) # Let the device process the events
-        self.ui.close()
+        #self.ui.close()
 
     def executeIteration(self, step: dict) -> None:
             if step['type'] == 'wait':

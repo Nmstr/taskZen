@@ -3,6 +3,16 @@ from executer import Executer
 import argparse
 import yaml
 import os
+import socket
+
+serverAddress = '/tmp/taskZen_socket'
+
+def sendInstruction(instruction, socketPath=serverAddress):
+    with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+        s.connect(socketPath)
+        s.sendall(instruction.encode())
+        response = s.recv(1024)
+        print(response.decode())
 
 def main():
     scriptDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/'
@@ -55,11 +65,8 @@ def main():
             else:
                 allowExec = True
 
-        # Initialize the input device
-        allKeys, ui = initialize(scriptData)
-        
-        executer = Executer(ui=ui, allKeys=allKeys, verbose=args.verbose, allowExec=allowExec)
-        executer.execute(scriptData)
+        instruction = args.name
+        sendInstruction(instruction)
 
     elif args.command in ['list', 'ls']:
         # List all scripts
