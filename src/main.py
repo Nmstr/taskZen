@@ -15,7 +15,7 @@ def sendInstruction(instruction, socketPath=serverAddress):
         print(response.decode())
 
 def main():
-    scriptDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/'
+    scriptDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/scripts/'
     if not os.path.exists(scriptDir):
         os.makedirs(scriptDir, exist_ok=True)
 

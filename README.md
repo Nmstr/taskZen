@@ -47,10 +47,6 @@ Prerequisites: Make sure you have Python, pip, and git installed on your system.
 
 `taskZen`
 
-6. (Optional) Clone the example scripts into the scripts directory
-
-`cp -r ../examples/* ~/.config/taskZen/`
-
 # Authors
 
 Namester (Nmstr)

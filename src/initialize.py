@@ -69,7 +69,7 @@ def findScript(scriptName: str):
     Returns:
         - scriptPath (str): The path to the script
     """
-    scriptDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/'
+    scriptDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/scripts/'
     for script in os.listdir(scriptDir):
         with open(scriptDir + script, 'r') as file:
             data = yaml.safe_load(file)
