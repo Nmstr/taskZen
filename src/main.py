@@ -1,18 +1,41 @@
 from initialize import initialize, readScript, findScript, scriptContainsExec
 from executer import Executer
 import argparse
+import socket
 import yaml
 import os
-import socket
 
-serverAddress = '/tmp/taskZen_socket'
+HEADER_LENGTH = 10  # Adjust the header length to your needs
 
-def sendInstruction(instruction, socketPath=serverAddress):
+def sendInstruction(instruction, *, verbose=True):
+    """
+    A function that sends an instruction over a Unix socket connection and recieves a response.
+
+    Parameters:
+        - instruction (str): The instruction to be sent.
+        - verbose (bool, optional): Flag to indicate whether to print the response. Defaults to True.
+
+    Returns:
+        None
+    """
+    def receiveMessage(sock):
+        header = sock.recv(HEADER_LENGTH).decode('utf-8')
+        if not header:
+            return None
+        messageLength = int(header.strip())
+        return sock.recv(messageLength).decode('utf-8')
+
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+        socketPath = '/tmp/taskZen_socket'
         s.connect(socketPath)
         s.sendall(instruction.encode())
-        response = s.recv(1024)
-        print(response.decode())
+        
+        while True:
+            response = receiveMessage(s)
+            if response == "end":
+                break
+            if verbose and response:
+                print(response)
 
 def main():
     scriptDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/scripts/'
@@ -30,6 +53,10 @@ def main():
 
     parserList = subparsers.add_parser('list', aliases=['ls'], help='list all connections')
 
+    parserServer = subparsers.add_parser('server', help='Manage the taskZen server')
+    parserServer.add_argument('-s', '--start', action='store_true', help='start the execution server')
+    parserServer.add_argument('-k', '--kill', action='store_true', help='kill the execution server')
+    
     args = parser.parse_args()
 
     if args.command is None:
@@ -76,6 +103,30 @@ def main():
             with open(scriptDir + file, 'r') as f:
                 scriptData = yaml.safe_load(f)
             print(f'\t- {scriptData['name']} ({os.path.abspath(scriptDir + file)})')
+
+    elif args.command in ['server']:
+        print(args)
+        if args.start:
+            print('Starting taskZen server')
+            try:
+                sendInstruction('ping', verbose=False)
+                print('Server already running')
+            except ConnectionRefusedError:
+                from subprocess import DEVNULL
+                import subprocess
+                script_path = f'{os.path.dirname(os.path.realpath(__file__))}/executionServer.py'
+                # Start the subprocess in a new session and redirect standard streams to DEVNULL
+                subprocess.Popen(
+                    [f"{os.path.join(os.getenv('VIRTUAL_ENV', ''), 'bin/python')}", script_path],
+                    start_new_session=True,
+                    stdout=DEVNULL,
+                    stderr=DEVNULL,
+                    stdin=DEVNULL
+                )
+
+        elif args.kill:
+            print('Killing taskZen server')
+            sendInstruction('kill', verbose=True)
 
 if __name__ == '__main__':
     main()

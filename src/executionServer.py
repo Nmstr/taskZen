@@ -4,10 +4,17 @@ import socket
 import os
 
 serverAddress = '/tmp/taskZen_socket'
+HEADER_LENGTH = 10
 
 class Svr:
     def __init__(self):
         self.allDevices = {}
+
+    def sendMessage(self, message):
+        # Prepend the length of the message as a fixed-size header
+        messageLength = len(message)
+        header = f"{messageLength:<{HEADER_LENGTH}}".encode('utf-8')
+        self.conn.sendall(header + message.encode('utf-8'))
 
     def getDevice(self, scriptData):
         if self.allDevices.get(scriptData['name']) is None:
@@ -26,8 +33,10 @@ class Svr:
         ui = self.getDevice(scriptData)
         allowExec = False
         
+        self.sendMessage('test')
         executer = Executer(ui=ui, allKeys=allKeys, verbose=True, allowExec=allowExec)
         executer.execute(scriptData)
+        self.sendMessage('test')
 
         return instruction
 
@@ -45,11 +54,18 @@ class Svr:
             s.bind(socketPath)
             s.listen()
             while True:
-                conn, addr = s.accept()
-                with conn:
-                    instruction = conn.recv(1024).decode()
-                    response = self.processInstruction(instruction)
-                    conn.sendall(response.encode())
+                self.conn, addr = s.accept()
+                with self.conn:
+                    instruction = self.conn.recv(1024).decode()
+                    if instruction == 'ping':
+                        self.sendMessage('end')
+                    elif instruction == 'kill':
+                        self.sendMessage('end')
+                        break
+                    else:
+                        response = self.processInstruction(instruction)
+                        self.sendMessage(response)
+                        self.sendMessage('end')
 
 if __name__ == "__main__":
     server = Svr()
