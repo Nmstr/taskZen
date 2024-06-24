@@ -49,7 +49,7 @@ Prerequisites: Make sure you have Python, pip, and git installed on your system.
 
 6. (Optional) Clone the example scripts into the scripts directory
 
-`cp -r ../examples/* ~/.config/taskZen/`
+`cp -r ../examples/* ~/.config/taskZen/scripts/`
 
 # Authors
 

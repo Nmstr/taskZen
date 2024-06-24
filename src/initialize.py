@@ -4,13 +4,7 @@ import os
 
 def initialize(scriptData: dict):
     # Create the allKeys dictionary
-    allKeys = {}
-    for key, values in e.keys.items():
-        if isinstance(values, list):
-            for value in values:
-                allKeys[value] = key
-        else:
-            allKeys[values] = key
+    allKeys = getAllKeys()
         
     # Create the key list
     keyList = []
@@ -36,7 +30,18 @@ def initialize(scriptData: dict):
     # Create the virtual input device with absolute positioning
     ui = UInput(cap, name='taskZen-virtual-input-device', phys='taskZen-virtual-input-device')
 
-    return allKeys, ui
+    return ui
+
+def getAllKeys():
+    # Create the allKeys dictionary
+    allKeys = {}
+    for key, values in e.keys.items():
+        if isinstance(values, list):
+            for value in values:
+                allKeys[value] = key
+        else:
+            allKeys[values] = key
+    return allKeys
 
 def readScript(scriptPath: str = "examples/exampleKeyboard.yaml"):
     """
@@ -64,7 +69,7 @@ def findScript(scriptName: str):
     Returns:
         - scriptPath (str): The path to the script
     """
-    scriptDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/'
+    scriptDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/scripts/'
     for script in os.listdir(scriptDir):
         with open(scriptDir + script, 'r') as file:
             data = yaml.safe_load(file)

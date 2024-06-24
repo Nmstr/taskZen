@@ -3,7 +3,7 @@ import subprocess
 import time
 
 class Executer:
-    def __init__(self, *, ui, allKeys: dict, verbose: bool = False, allowExec: bool = False) -> None:
+    def __init__(self, *, parent = None, ui, allKeys: dict, allowExec: bool = False) -> None:
         """
         Initialize the executer
         
@@ -12,10 +12,10 @@ class Executer:
             - allKeys (dict): The dictionary of all keys
             - verbose (bool, optional): Whether to print verbose output. Defaults to False.
         """
+        self.parent = parent
         self.scriptData = None
         self.ui = ui
         self.allKeys = allKeys
-        self.verbose = verbose
         self.allowExec = allowExec
         self.executionSpeed = None
 
@@ -144,8 +144,7 @@ class Executer:
         elif operation == 'divide':
             self.variableData[variable] /= self.retrieveValue(value)
 
-        if self.verbose:
-            print(f'Variable Modified: {variable} {operation} {value} -> {self.variableData[variable]}')
+        self.parent.sendMessage(f'Variable Modified: {variable} {operation} {value} -> {self.variableData[variable]}', True)
 
     def execute(self, scriptData: dict) -> None:
         """
@@ -157,7 +156,7 @@ class Executer:
         # Load the script
         self.scriptData = scriptData
         if not self.scriptData:
-            print("Error: No script data")
+            self.parent.sendMessage(f'Error: No script data')
             return
         self.executionSpeed = self.scriptData['speed']
         if 'variables' in self.scriptData:
@@ -165,13 +164,11 @@ class Executer:
 
         # Execute the script
         for step in self.scriptData['steps']:
-            if self.verbose:
-                print(step)
+            self.parent.sendMessage(step, True)
             
             self.executeIteration(step)
 
         time.sleep(0.1) # Let the device process the events
-        self.ui.close()
 
     def executeIteration(self, step: dict) -> None:
             if step['type'] == 'wait':
@@ -193,24 +190,21 @@ class Executer:
                 self.actionModifyVariable(step['variable'], step['operation'], step['value'])
             elif step['type'] == 'loop':
                 for _ in range(self.retrieveValue(step['value'])):
-                    for subStep in step['subSteps']:
-                        if self.verbose:
-                            print('->', subStep)
+                    for subStep in step['subSteps']:    
+                        self.parent.sendMessage(f'-> {subStep}', True)
                         self.executeIteration(subStep)
             elif step['type'] == 'if':
                 if self.evaluateCondition(step['operation'], step['value1'], step.get('value2', None)):
                     if 'trueSteps' not in step: # If there are no true steps, return
                         return
-                    for subStep in step['trueSteps']:
-                        if self.verbose:
-                            print('->', subStep)
+                    for subStep in step['trueSteps']:    
+                        self.parent.sendMessage(f'-> {subStep}', True)
                         self.executeIteration(subStep)
                 else:
                     if 'falseSteps' not in step: # If there are no true steps, return
                         return
-                    for subStep in step['falseSteps']:
-                        if self.verbose:
-                            print('->', subStep)
+                    for subStep in step['falseSteps']:    
+                        self.parent.sendMessage(f'-> {subStep}', True)
                         self.executeIteration(subStep)
 
             time.sleep(self.executionSpeed / 1000)
@@ -239,8 +233,7 @@ class Executer:
         if value2 is not None:
             value2 = self.retrieveValue(value2)
             
-        if self.verbose:
-            print(f'Condition: {value1} ({type(value1)}) {operation} {value2} ({type(value2)})')
+        self.parent.sendMessage(f'Condition: {value1} ({type(value1)}) {operation} {value2} ({type(value2)})', True)
 
         # Evaluate condition
         if operation == 'bool':
@@ -278,13 +271,11 @@ class Executer:
             return value
         
         if value.startswith('$'):
-            if self.verbose:
-                print(f'Variable -> {value}: {self.variableData.get(value[1:])}')
+            self.parent.sendMessage(f'Variable -> {value}: {self.variableData.get(value[1:])}', True)
             return self.variableData.get(value[1:])
         
         elif value.startswith('-$'): # Invert variable
-            if self.verbose:
-                print(f'Variable -> {value[1:]}: {-self.variableData.get(value[2:])}')
+            self.parent.sendMessage(f'Variable -> {value[1:]}: {-self.variableData.get(value[2:])}', True)
             return -self.variableData.get(value[2:])
         
         return value
