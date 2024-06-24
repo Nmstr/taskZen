@@ -1,5 +1,4 @@
-from initialize import initialize, readScript, findScript, scriptContainsExec
-from executer import Executer
+from initialize import readScript, findScript, scriptContainsExec
 import argparse
 import socket
 import yaml
