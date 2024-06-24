@@ -93,7 +93,7 @@ def main():
                 allowExec = True
 
         instruction = args.name
-        sendInstruction(instruction)
+        sendInstruction(f'execute-{instruction}-{allowExec}-{args.verbose}')
 
     elif args.command in ['list', 'ls']:
         # List all scripts
@@ -111,7 +111,7 @@ def main():
             try:
                 sendInstruction('ping', verbose=False)
                 print('Server already running')
-            except ConnectionRefusedError:
+            except (ConnectionRefusedError, FileNotFoundError):
                 from subprocess import DEVNULL
                 import subprocess
                 script_path = f'{os.path.dirname(os.path.realpath(__file__))}/executionServer.py'
