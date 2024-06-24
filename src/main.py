@@ -104,7 +104,6 @@ def main():
             print(f'\t- {scriptData['name']} ({os.path.abspath(scriptDir + file)})')
 
     elif args.command in ['server']:
-        print(args)
         if args.start:
             print('Starting taskZen server')
             try:
