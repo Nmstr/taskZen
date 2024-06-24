@@ -92,7 +92,12 @@ def main():
                 allowExec = True
 
         instruction = args.name
-        sendInstruction(f'execute-{instruction}-{allowExec}-{args.verbose}')
+        try:
+            sendInstruction(f'execute-{instruction}-{allowExec}-{args.verbose}')
+        except (ConnectionRefusedError, FileNotFoundError):
+            print()
+            print('Failed to send instruction. Server not running?')
+            print('You can start the server using `taskZen server -s`')
 
     elif args.command in ['list', 'ls']:
         # List all scripts
@@ -124,7 +129,10 @@ def main():
 
         elif args.kill:
             print('Killing taskZen server')
-            sendInstruction('kill', verbose=True)
+            try:
+                sendInstruction('kill', verbose=True)
+            except (ConnectionRefusedError, FileNotFoundError):
+                print('Server not running')
 
 if __name__ == '__main__':
     main()
