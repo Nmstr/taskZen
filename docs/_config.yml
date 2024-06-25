@@ -1,0 +1,9 @@
+title: taskZen Documentation
+description: >-
+  Documentation for taskZen. The automation utility for Wayland.
+baseurl: ""
+url: "https://nmstr.github.io"
+
+theme: just-the-docs
+
+color_scheme: dark
