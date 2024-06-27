@@ -38,10 +38,13 @@ class Svr:
 
         scriptData = readScript(scriptPath)
         allKeys = getAllKeys()
-        ui = self.getDevice(scriptData)
         
-        executer = Executer(parent=self, ui=ui, allKeys=allKeys, allowExec=allowExec)
-        executionThread = threading.Thread(target=executer.execute, args=(scriptData,))
+        def executeScript():
+            ui = self.getDevice(scriptData)
+            executer = Executer(parent=self, ui=ui, allKeys=allKeys, allowExec=allowExec)
+            executer.execute(scriptData)
+        
+        executionThread = threading.Thread(target=executeScript)
         executionThread.start()
 
         return 'Done'
