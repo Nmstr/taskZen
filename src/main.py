@@ -66,10 +66,11 @@ def main():
         exit(0)
 
     elif args.command in ['execute']:
-        print(f'Executing {args.name}')
         if args.kill:
+            print(f'Killing execution with ID: {args.name}')
             sendInstruction(f'killExecution-{args.name}')
             exit(0)
+        print(f'Executing {args.name}')
 
         if args.file:
             scriptPath = args.name
