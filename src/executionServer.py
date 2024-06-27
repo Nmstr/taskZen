@@ -62,11 +62,14 @@ class Svr:
                 with self.conn:
                     instruction = self.conn.recv(1024).decode()
                     print(f'Received instruction: {instruction}')
+
                     if instruction == 'ping':
                         self.sendMessage('end')
+
                     elif instruction == 'kill':
                         self.sendMessage('end')
                         break
+                    
                     elif instruction.split('-')[0] == 'execute':
                         executionInstruction = instruction.split('-')[1]
                         allowExec = instruction.split('-')[2]
@@ -75,6 +78,7 @@ class Svr:
                         response = self.processInstruction(executionInstruction, allowExec=bool(allowExec))
                         self.sendMessage(response)
                         self.sendMessage('end')
+
                     else:
                         self.sendMessage(f'Unknown instruction: {instruction}')
                         self.sendMessage('end')
