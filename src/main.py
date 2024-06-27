@@ -106,8 +106,6 @@ def main():
             print('You can start the server using `taskZen server -s`')
 
     elif args.command in ['list', 'ls']:
-        print(args)
-
         print('\ttaskZen\nAutomation utility for Wayland\n')
         # List running scripts
         if args.running:
