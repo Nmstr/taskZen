@@ -134,5 +134,8 @@ def main():
             except (ConnectionRefusedError, FileNotFoundError):
                 print('Server not running')
 
+        else:
+            parserServer.print_help()
+
 if __name__ == '__main__':
     main()
