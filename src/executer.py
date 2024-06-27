@@ -21,6 +21,7 @@ class Executer:
         self.allKeys = allKeys
         self.allowExec = allowExec
         self.executionSpeed = None
+        self.stopFlag = False
 
     def actionWait(self, sleepTime: int) -> None:
         """
@@ -181,6 +182,8 @@ class Executer:
         Returns:
             None: This function does not return anything.
         """
+        if self.stopFlag:
+            return
         if step['type'] == 'wait':
             self.actionWait(step['value'])
         elif step['type'] == 'press':
@@ -289,3 +292,9 @@ class Executer:
             return -self.variableData.get(value[2:])
         
         return value
+
+    def stop(self) -> None:
+        """
+        Stops the execution of the script.
+        """
+        self.stopFlag = True

@@ -12,7 +12,7 @@ nav_order: 200
 
 Example scripts are located in the "examples" directory. If they are missing you can obtain them in the repository again.
 
-To use them you will need to copy them into "~/.config/taskZen/"
+To use them you will need to copy them into "~/.config/taskZen/scripts/"
 
 ## List your scripts
 
