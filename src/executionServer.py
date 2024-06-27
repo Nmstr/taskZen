@@ -56,7 +56,7 @@ class Svr:
             self.sendMessage(f'Device initialized.', True, connId=connId)
         return self.allDevices[scriptData['name']]
 
-    def processInstruction(self, scriptName, *, instruction = None, connId = None, allowExec = False):
+    def processInstruction(self, scriptName, *, instruction = None, connId = None, allowExec = False, file = False):
         """
         Process an instruction by executing a script.
 
@@ -72,7 +72,12 @@ class Svr:
         Raises:
             SystemExit: If the script is not found.
         """
-        scriptPath = findScript(scriptName)
+        print(file, type(file))
+        if file == 'True':
+            print(f'Using file: {scriptName}')
+            scriptPath = scriptName
+        else:
+            scriptPath = findScript(scriptName)
         if scriptPath is None or not os.path.exists(scriptPath):
             self.sendMessage(f'Script {scriptName} not found.', connId=connId)
             exit(1)
@@ -179,8 +184,9 @@ class Svr:
                     scriptName = instruction.split('-')[1]
                     allowExec = instruction.split('-')[2]
                     self.verbose = instruction.split('-')[3]
+                    file = instruction.split('-')[4]
 
-                    self.processInstruction(scriptName, instruction=instruction, connId=connId, allowExec=bool(allowExec))
+                    self.processInstruction(scriptName, instruction=instruction, connId=connId, allowExec=bool(allowExec), file=file)
 
                 else:
                     self.sendMessage(f'Unknown instruction: {instruction}', connId=connId)

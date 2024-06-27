@@ -99,7 +99,7 @@ def main():
                 allowExec = True
 
         try:
-            sendInstruction(f'execute-{args.name}-{allowExec}-{args.verbose}')
+            sendInstruction(f'execute-{args.name}-{allowExec}-{args.verbose}-{args.file}')
         except (ConnectionRefusedError, FileNotFoundError):
             print()
             print('Failed to send instruction. Server not running?')
