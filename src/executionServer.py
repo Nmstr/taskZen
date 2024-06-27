@@ -14,6 +14,7 @@ class Svr:
         self.connections = {}
         self.connectionId = 0
         self.lock = threading.Lock()
+        self.runningExecutions = []
 
     def sendMessage(self, message, requireVerbose=False, *, connId):
         """
@@ -72,17 +73,19 @@ class Svr:
         """
         scriptPath = findScript(scriptName)
         if scriptPath is None or not os.path.exists(scriptPath):
-            self.sendMessage(f'Script {scriptName} not found.')
+            self.sendMessage(f'Script {scriptName} not found.', connId=connId)
             exit(1)
 
         scriptData = readScript(scriptPath)
         allKeys = getAllKeys()
         
         def executeScript():
+            self.runningExecutions.append([connId, instruction])
             ui = self.getDevice(scriptData, connId=connId)
             executer = Executer(parent=self, connId=connId, ui=ui, allKeys=allKeys, allowExec=allowExec)
             executer.execute(scriptData)
             self.sendMessage(f'{instruction} end', connId=connId)
+            self.runningExecutions.remove([connId, instruction])
         
         executionThread = threading.Thread(target=executeScript)
         executionThread.start()
@@ -148,11 +151,16 @@ class Svr:
                 print(f'Received instruction: {instruction}')
 
                 if instruction == 'ping':
-                    self.sendMessage(f'{instruction} end', connId)
+                    self.sendMessage(f'{instruction} end', connId=connId)
 
                 elif instruction == 'kill':
-                    self.sendMessage(f'{instruction} end', connId)
+                    self.sendMessage(f'{instruction} end', connId=connId)
                     break
+
+                elif instruction == 'list-running':
+                    for execution in self.runningExecutions:
+                        self.sendMessage(f'{execution[0]}: {execution[1].split("-")[1]}', connId=connId)
+                    self.sendMessage(f'{instruction} end', connId=connId)
                     
                 elif instruction.split('-')[0] == 'execute':
                     scriptName = instruction.split('-')[1]
@@ -162,8 +170,8 @@ class Svr:
                     self.processInstruction(scriptName, instruction=instruction, connId=connId, allowExec=bool(allowExec))
 
                 else:
-                    self.sendMessage(f'Unknown instruction: {instruction}', connId)
-                    self.sendMessage(f'{instruction} end', connId)
+                    self.sendMessage(f'Unknown instruction: {instruction}', connId=connId)
+                    self.sendMessage(f'{instruction} end', connId=connId)
         finally:
             with self.lock:
                 conn = self.connections.pop(connId)

@@ -50,12 +50,13 @@ def main():
     parserAdd.add_argument('-v', '--verbose', action='store_true', help='Make the output verbose')
     parserAdd.add_argument('-y', '--yes', action='store_true', help='Answer yes to all prompts')
 
-    parserList = subparsers.add_parser('list', aliases=['ls'], help='list all connections')
+    parserList = subparsers.add_parser('list', aliases=['ls'], help='list all scripts')
+    parserList.add_argument('-r', '--running', action='store_true', help='list all running scripts')
 
     parserServer = subparsers.add_parser('server', help='Manage the taskZen server')
     parserServer.add_argument('-s', '--start', action='store_true', help='start the execution server')
     parserServer.add_argument('-k', '--kill', action='store_true', help='kill the execution server')
-    
+
     args = parser.parse_args()
 
     if args.command is None:
@@ -100,8 +101,16 @@ def main():
             print('You can start the server using `taskZen server -s`')
 
     elif args.command in ['list', 'ls']:
-        # List all scripts
+        print(args)
+
         print('\ttaskZen\nAutomation utility for Wayland\n')
+        # List running scripts
+        if args.running:
+            print('Running scripts:')
+            result = sendInstruction('list-running')
+            exit(0)
+        
+        # List all scripts
         print('Available scripts:')
         for file in os.listdir(scriptDir):
             with open(scriptDir + file, 'r') as f:
