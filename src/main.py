@@ -73,7 +73,7 @@ def main():
 
         if args.file:
             scriptPath = args.name
-        else: 
+        else:
             scriptPath = findScript(args.name)
 
         if scriptPath is None or not os.path.exists(scriptPath):
