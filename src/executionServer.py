@@ -29,10 +29,10 @@ class Svr:
             self.sendMessage(f'Device initialized.', True)
         return self.allDevices[scriptData['name']]
 
-    def processInstruction(self, instruction, *, allowExec = False):
-        scriptPath = findScript(instruction)
+    def processInstruction(self, scriptName, *, allowExec = False):
+        scriptPath = findScript(scriptName)
         if scriptPath is None or not os.path.exists(scriptPath):
-            self.sendMessage(f'Script {instruction} not found.')
+            self.sendMessage(f'Script {scriptName} not found.')
             exit(1)
 
         scriptData = readScript(scriptPath)
@@ -71,11 +71,11 @@ class Svr:
                         break
                     
                     elif instruction.split('-')[0] == 'execute':
-                        executionInstruction = instruction.split('-')[1]
+                        scriptName = instruction.split('-')[1]
                         allowExec = instruction.split('-')[2]
                         self.verbose = instruction.split('-')[3]
 
-                        response = self.processInstruction(executionInstruction, allowExec=bool(allowExec))
+                        response = self.processInstruction(scriptName, allowExec=bool(allowExec))
                         self.sendMessage(response)
                         self.sendMessage('end')
 
