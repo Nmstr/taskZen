@@ -161,12 +161,11 @@ class Svr:
                     break
 
                 elif instruction.split('-')[0] == 'killExecution':
-                    print(instruction.split('-')[1])
-                    print(self.executers)
-                    executer = self.executers[int(instruction.split('-')[1])]
-                    executer.stop()
-                    # instruction..split('-')[1] returns and int
-                    # The int is the connId of the one to be killed
+                    try:
+                        executer = self.executers[int(instruction.split('-')[1])]
+                        executer.stop()
+                    except KeyError:
+                        self.sendMessage(f'Execution {instruction.split("-")[1]} not found.', connId=connId)
                     self.sendMessage(f'{instruction} end', connId=connId)
 
                 elif instruction == 'listRunning':
