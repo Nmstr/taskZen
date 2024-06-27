@@ -11,26 +11,31 @@ class Svr:
     def __init__(self):
         self.allDevices = {}
         self.verbose = False
+        self.connections = {}
+        self.connection_id = 0
+        self.lock = threading.Lock()
 
-    def sendMessage(self, message, requireVerbose=False):
+    def sendMessage(self, message, requireVerbose=False, *, connId):
         if requireVerbose and self.verbose == 'False':
             print(f'withheld message: {message}')
             return
         message = str(message)
         messageLength = len(message)
         header = f"{messageLength:<{HEADER_LENGTH}}".encode('utf-8')
-        self.conn.sendall(header + message.encode('utf-8'))
+        with self.lock:
+            conn = self.connections[connId]
+            conn.sendall(header + message.encode('utf-8'))
         print(message)
 
-    def getDevice(self, scriptData):
+    def getDevice(self, scriptData, *, connId):
         if self.allDevices.get(scriptData['name']) is None:
-            self.sendMessage(f'Device not found. Initializing...', True)
+            self.sendMessage(f'Device not found. Initializing...', True, connId=connId)
             ui = initialize(scriptData)
             self.allDevices[scriptData['name']] = ui
-            self.sendMessage(f'Device initialized.', True)
+            self.sendMessage(f'Device initialized.', True, connId=connId)
         return self.allDevices[scriptData['name']]
 
-    def processInstruction(self, scriptName, *, allowExec = False):
+    def processInstruction(self, scriptName, *, instruction = None, connId = None, allowExec = False):
         scriptPath = findScript(scriptName)
         if scriptPath is None or not os.path.exists(scriptPath):
             self.sendMessage(f'Script {scriptName} not found.')
@@ -40,9 +45,10 @@ class Svr:
         allKeys = getAllKeys()
         
         def executeScript():
-            ui = self.getDevice(scriptData)
-            executer = Executer(parent=self, ui=ui, allKeys=allKeys, allowExec=allowExec)
+            ui = self.getDevice(scriptData, connId=connId)
+            executer = Executer(parent=self, connId=connId, ui=ui, allKeys=allKeys, allowExec=allowExec)
             executer.execute(scriptData)
+            self.sendMessage(f'{instruction} end', connId=connId)
         
         executionThread = threading.Thread(target=executeScript)
         executionThread.start()
@@ -63,30 +69,45 @@ class Svr:
             s.bind(socketPath)
             s.listen()
             while True:
-                self.conn, addr = s.accept()
-                with self.conn:
-                    instruction = self.conn.recv(1024).decode()
-                    print(f'Received instruction: {instruction}')
+                conn, addr = s.accept()
+                with self.lock:
+                    self.connection_id += 1
+                    connId = self.connection_id
+                    self.connections[connId] = conn
+                
+                thread = threading.Thread(target=self.handleConnection, args=(connId,))
+                thread.start()
 
-                    if instruction == 'ping':
-                        self.sendMessage(f'{instruction} end')
+    def handleConnection(self, connId):
+        try:
+            conn = self.connections[connId]
+            while True:
+                instruction = conn.recv(1024).decode()
+                if not instruction:
+                    break
+                print(f'Received instruction: {instruction}')
 
-                    elif instruction == 'kill':
-                        self.sendMessage(f'{instruction} end')
-                        break
+                if instruction == 'ping':
+                    self.sendMessage(f'{instruction} end', connId)
+
+                elif instruction == 'kill':
+                    self.sendMessage(f'{instruction} end', connId)
+                    break
                     
-                    elif instruction.split('-')[0] == 'execute':
-                        scriptName = instruction.split('-')[1]
-                        allowExec = instruction.split('-')[2]
-                        self.verbose = instruction.split('-')[3]
+                elif instruction.split('-')[0] == 'execute':
+                    scriptName = instruction.split('-')[1]
+                    allowExec = instruction.split('-')[2]
+                    self.verbose = instruction.split('-')[3]
 
-                        response = self.processInstruction(scriptName, allowExec=bool(allowExec))
-                        self.sendMessage(response)
-                        self.sendMessage(f'{instruction} end')
+                    self.processInstruction(scriptName, instruction=instruction, connId=connId, allowExec=bool(allowExec))
 
-                    else:
-                        self.sendMessage(f'Unknown instruction: {instruction}')
-                        self.sendMessage(f'{instruction} end')
+                else:
+                    self.sendMessage(f'Unknown instruction: {instruction}', connId)
+                    self.sendMessage(f'{instruction} end', connId)
+        finally:
+            with self.lock:
+                conn = self.connections.pop(connId)
+                conn.close()
 
 if __name__ == "__main__":
     server = Svr()
