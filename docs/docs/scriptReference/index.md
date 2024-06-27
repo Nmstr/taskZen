@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Script Reference
-nav_order: 500
+nav_order: 600
 has_children: true
 permalink: /scriptReference/
 ---
