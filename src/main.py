@@ -31,7 +31,7 @@ def sendInstruction(instruction, *, verbose=True):
         
         while True:
             response = receiveMessage(s)
-            if response == "end":
+            if response == f'{instruction} end':
                 break
             if verbose and response:
                 print(response)

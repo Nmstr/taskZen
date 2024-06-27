@@ -3,16 +3,19 @@ import subprocess
 import time
 
 class Executer:
-    def __init__(self, *, parent = None, ui, allKeys: dict, allowExec: bool = False) -> None:
+    def __init__(self, *, parent, connId, ui, allKeys: dict, allowExec: bool = False) -> None:
         """
         Initialize the executer
         
         Parameters:
-            - ui (UInput): The UInput object
-            - allKeys (dict): The dictionary of all keys
-            - verbose (bool, optional): Whether to print verbose output. Defaults to False.
+            - parent (Svr): The parent server
+            - connId (int): The connection ID
+            - ui (evdev.InputDevice): The input device
+            - allKeys (dict): A dictionary of all keys
+            - allowExec (bool, optional): Whether to allow execution. Defaults to False.
         """
         self.parent = parent
+        self.connId = connId
         self.scriptData = None
         self.ui = ui
         self.allKeys = allKeys
@@ -144,7 +147,7 @@ class Executer:
         elif operation == 'divide':
             self.variableData[variable] /= self.retrieveValue(value)
 
-        self.parent.sendMessage(f'Variable Modified: {variable} {operation} {value} -> {self.variableData[variable]}', True)
+        self.parent.sendMessage(f'Variable Modified: {variable} {operation} {value} -> {self.variableData[variable]}', True, connId=self.connId)
 
     def execute(self, scriptData: dict) -> None:
         """
@@ -156,7 +159,7 @@ class Executer:
         # Load the script
         self.scriptData = scriptData
         if not self.scriptData:
-            self.parent.sendMessage(f'Error: No script data')
+            self.parent.sendMessage(f'Error: No script data', connId=self.connId)
             return
         self.executionSpeed = self.scriptData['speed']
         if 'variables' in self.scriptData:
@@ -164,50 +167,57 @@ class Executer:
 
         # Execute the script
         for step in self.scriptData['steps']:
-            self.parent.sendMessage(step, True)
+            self.parent.sendMessage(step, True, connId=self.connId)
             
             self.executeIteration(step)
 
         time.sleep(0.1) # Let the device process the events
 
     def executeIteration(self, step: dict) -> None:
-            if step['type'] == 'wait':
-                self.actionWait(step['value'])
-            elif step['type'] == 'press':
-                self.actionPressKey(step['value'])
-            elif step['type'] == 'release':
-                self.actionReleaseKey(step['value'])
-            elif step['type'] == 'tap':
-                self.actionTapKey(step['value'], step.get('modifier', None))
-            elif step['type'] == 'move-absolute':
-                self.actionMoveAbsolute(step['x'], step['y'])
-            elif step['type'] == 'move-relative':
-                self.actionMoveRelative(step['x'], step['y'])
-            elif step['type'] == 'exec':
-                if self.allowExec:
-                    self.actionExec(step['value'].split(), step.get('blocking', False))
-            elif step['type'] == 'modify-variable':
-                self.actionModifyVariable(step['variable'], step['operation'], step['value'])
-            elif step['type'] == 'loop':
-                for _ in range(self.retrieveValue(step['value'])):
-                    for subStep in step['subSteps']:    
-                        self.parent.sendMessage(f'-> {subStep}', True)
-                        self.executeIteration(subStep)
-            elif step['type'] == 'if':
-                if self.evaluateCondition(step['operation'], step['value1'], step.get('value2', None)):
-                    if 'trueSteps' not in step: # If there are no true steps, return
-                        return
-                    for subStep in step['trueSteps']:    
-                        self.parent.sendMessage(f'-> {subStep}', True)
-                        self.executeIteration(subStep)
-                else:
-                    if 'falseSteps' not in step: # If there are no true steps, return
-                        return
-                    for subStep in step['falseSteps']:    
-                        self.parent.sendMessage(f'-> {subStep}', True)
-                        self.executeIteration(subStep)
+        """
+        Executes a single iteration of the script based on the given step.
+        Args:
+            step (dict): A dictionary representing a step in the script.
+        Returns:
+            None: This function does not return anything.
+        """
+        if step['type'] == 'wait':
+            self.actionWait(step['value'])
+        elif step['type'] == 'press':
+            self.actionPressKey(step['value'])
+        elif step['type'] == 'release':
+            self.actionReleaseKey(step['value'])
+        elif step['type'] == 'tap':
+            self.actionTapKey(step['value'], step.get('modifier', None))
+        elif step['type'] == 'move-absolute':
+            self.actionMoveAbsolute(step['x'], step['y'])
+        elif step['type'] == 'move-relative':
+            self.actionMoveRelative(step['x'], step['y'])
+        elif step['type'] == 'exec':
+            if self.allowExec:
+                self.actionExec(step['value'].split(), step.get('blocking', False))
+        elif step['type'] == 'modify-variable':
+            self.actionModifyVariable(step['variable'], step['operation'], step['value'])
+        elif step['type'] == 'loop':
+            for _ in range(self.retrieveValue(step['value'])):
+                for subStep in step['subSteps']:    
+                    self.parent.sendMessage(f'-> {subStep}', True, connId=self.connId)
+                    self.executeIteration(subStep)
+        elif step['type'] == 'if':
+            if self.evaluateCondition(step['operation'], step['value1'], step.get('value2', None)):
+                if 'trueSteps' not in step: # If there are no true steps, return
+                    return
+                for subStep in step['trueSteps']:    
+                    self.parent.sendMessage(f'-> {subStep}', True, connId=self.connId)
+                    self.executeIteration(subStep)
+            else:
+                if 'falseSteps' not in step: # If there are no true steps, return
+                    return
+                for subStep in step['falseSteps']:    
+                    self.parent.sendMessage(f'-> {subStep}', True, connId=self.connId)
+                    self.executeIteration(subStep)
 
-            time.sleep(self.executionSpeed / 1000)
+        time.sleep(self.executionSpeed / 1000)
 
     def evaluateCondition(self, operation: str, value1, value2 = None) -> bool:
         """
@@ -233,7 +243,7 @@ class Executer:
         if value2 is not None:
             value2 = self.retrieveValue(value2)
             
-        self.parent.sendMessage(f'Condition: {value1} ({type(value1)}) {operation} {value2} ({type(value2)})', True)
+        self.parent.sendMessage(f'Condition: {value1} ({type(value1)}) {operation} {value2} ({type(value2)})', True, connId=self.connId)
 
         # Evaluate condition
         if operation == 'bool':
@@ -271,11 +281,11 @@ class Executer:
             return value
         
         if value.startswith('$'):
-            self.parent.sendMessage(f'Variable -> {value}: {self.variableData.get(value[1:])}', True)
+            self.parent.sendMessage(f'Variable -> {value}: {self.variableData.get(value[1:])}', True, connId=self.connId)
             return self.variableData.get(value[1:])
         
         elif value.startswith('-$'): # Invert variable
-            self.parent.sendMessage(f'Variable -> {value[1:]}: {-self.variableData.get(value[2:])}', True)
+            self.parent.sendMessage(f'Variable -> {value[1:]}: {-self.variableData.get(value[2:])}', True, connId=self.connId)
             return -self.variableData.get(value[2:])
         
         return value
