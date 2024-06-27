@@ -1,5 +1,6 @@
 from initialize import initialize, readScript, findScript, getAllKeys
 from executer import Executer
+import threading
 import socket
 import os
 
@@ -40,7 +41,8 @@ class Svr:
         ui = self.getDevice(scriptData)
         
         executer = Executer(parent=self, ui=ui, allKeys=allKeys, allowExec=allowExec)
-        executer.execute(scriptData)
+        executionThread = threading.Thread(target=executer.execute, args=(scriptData,))
+        executionThread.start()
 
         return 'Done'
 
