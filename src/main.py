@@ -49,6 +49,7 @@ def main():
     parserAdd.add_argument('-f', '--file', action='store_true', help='Use file path instead of name')
     parserAdd.add_argument('-v', '--verbose', action='store_true', help='Make the output verbose')
     parserAdd.add_argument('-y', '--yes', action='store_true', help='Answer yes to all prompts')
+    parserAdd.add_argument('-k', '--kill', action='store_true', help='Kill the running script')
 
     parserList = subparsers.add_parser('list', aliases=['ls'], help='list all scripts')
     parserList.add_argument('-r', '--running', action='store_true', help='list all running scripts')
@@ -66,6 +67,10 @@ def main():
 
     elif args.command in ['execute']:
         print(f'Executing {args.name}')
+        if args.kill:
+            sendInstruction(f'killExecution-{args.name}')
+            exit(0)
+
         if args.file:
             scriptPath = args.name
         else: 
@@ -92,9 +97,8 @@ def main():
             else:
                 allowExec = True
 
-        instruction = args.name
         try:
-            sendInstruction(f'execute-{instruction}-{allowExec}-{args.verbose}')
+            sendInstruction(f'execute-{args.name}-{allowExec}-{args.verbose}')
         except (ConnectionRefusedError, FileNotFoundError):
             print()
             print('Failed to send instruction. Server not running?')
@@ -107,7 +111,7 @@ def main():
         # List running scripts
         if args.running:
             print('Running scripts:')
-            result = sendInstruction('list-running')
+            result = sendInstruction('listRunning')
             exit(0)
         
         # List all scripts

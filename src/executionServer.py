@@ -15,6 +15,7 @@ class Svr:
         self.connectionId = 0
         self.lock = threading.Lock()
         self.runningExecutions = []
+        self.executers = {}
 
     def sendMessage(self, message, requireVerbose=False, *, connId):
         """
@@ -83,9 +84,11 @@ class Svr:
             self.runningExecutions.append([connId, instruction])
             ui = self.getDevice(scriptData, connId=connId)
             executer = Executer(parent=self, connId=connId, ui=ui, allKeys=allKeys, allowExec=allowExec)
+            self.executers[connId] = executer
             executer.execute(scriptData)
-            self.sendMessage(f'{instruction} end', connId=connId)
             self.runningExecutions.remove([connId, instruction])
+            self.executers.pop(connId)
+            self.sendMessage(f'{instruction} end', connId=connId)
         
         executionThread = threading.Thread(target=executeScript)
         executionThread.start()
@@ -157,7 +160,16 @@ class Svr:
                     self.sendMessage(f'{instruction} end', connId=connId)
                     break
 
-                elif instruction == 'list-running':
+                elif instruction.split('-')[0] == 'killExecution':
+                    print(instruction.split('-')[1])
+                    print(self.executers)
+                    executer = self.executers[int(instruction.split('-')[1])]
+                    executer.stop()
+                    # instruction..split('-')[1] returns and int
+                    # The int is the connId of the one to be killed
+                    self.sendMessage(f'{instruction} end', connId=connId)
+
+                elif instruction == 'listRunning':
                     for execution in self.runningExecutions:
                         self.sendMessage(f'{execution[0]}: {execution[1].split("-")[1]}', connId=connId)
                     self.sendMessage(f'{instruction} end', connId=connId)
