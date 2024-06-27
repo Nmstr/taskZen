@@ -166,6 +166,8 @@ class Svr:
                         executer.stop()
                     except KeyError:
                         self.sendMessage(f'Execution {instruction.split("-")[1]} not found.', connId=connId)
+                    except ValueError:
+                        self.sendMessage(f'Invalid execution ID: {instruction.split("-")[1]}', connId=connId)
                     self.sendMessage(f'{instruction} end', connId=connId)
 
                 elif instruction == 'listRunning':
