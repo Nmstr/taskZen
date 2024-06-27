@@ -69,10 +69,10 @@ class Svr:
                     print(f'Received instruction: {instruction}')
 
                     if instruction == 'ping':
-                        self.sendMessage('end')
+                        self.sendMessage(f'{instruction} end')
 
                     elif instruction == 'kill':
-                        self.sendMessage('end')
+                        self.sendMessage(f'{instruction} end')
                         break
                     
                     elif instruction.split('-')[0] == 'execute':
@@ -82,11 +82,11 @@ class Svr:
 
                         response = self.processInstruction(scriptName, allowExec=bool(allowExec))
                         self.sendMessage(response)
-                        self.sendMessage('end')
+                        self.sendMessage(f'{instruction} end')
 
                     else:
                         self.sendMessage(f'Unknown instruction: {instruction}')
-                        self.sendMessage('end')
+                        self.sendMessage(f'{instruction} end')
 
 if __name__ == "__main__":
     server = Svr()
