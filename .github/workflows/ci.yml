@@ -1,15 +1,7 @@
 name: CI
 
 on:
-  push:
-    branches:
-    - "master"
-    paths:
-    - 'docs/**'
   pull_request:
-    branches:
-    paths:
-    - 'docs/**'
 
 jobs:
   # Build job
