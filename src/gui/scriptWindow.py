@@ -1,11 +1,13 @@
-from PySide6.QtWidgets import QMainWindow, QWidget
+from PySide6.QtWidgets import QMainWindow, QWidget, QFileDialog
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
+import os
 
 class ScriptWindow(QMainWindow):
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
         self.setWindowTitle("taskZen - Script")
+        self.filepath = None
 
         # Load the UI file
         loader = QUiLoader()
@@ -22,10 +24,22 @@ class ScriptWindow(QMainWindow):
         self.ui.runBtn.clicked.connect(self.runScript)
 
     def saveScript(self) -> None:
+        outputText = 'Saving script...\n'
+        self.ui.sideText.setText(outputText)
         scriptData = self.ui.scriptInput.toPlainText()
-        print(scriptData)
-        with open('script.txt', 'w') as f:
+
+        if self.filepath is None:
+            options = QFileDialog.Options()
+            options |= QFileDialog.DontUseNativeDialog
+            self.filepath, _ = QFileDialog.getSaveFileName(self, "Save Script", os.path.expanduser("~/.config/taskZen/scripts"), "Yaml Files (*.yaml)", options=options)
+            if self.filepath == '':
+                return
+
+        with open(self.filepath, 'w') as f:
             f.write(scriptData)
+
+        outputText = 'Script saved\n'
+        self.ui.sideText.setText(outputText)
 
     def runScript(self) -> None:
         print('run script')
