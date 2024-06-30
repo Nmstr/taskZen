@@ -1,10 +1,6 @@
-from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QMainWindow, QWidget
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
-
-from script.moduleEntry import ModuleWidget
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QScrollArea, QSpacerItem
-
 
 class ScriptWindow(QMainWindow):
     def __init__(self, parent: QWidget = None) -> None:
@@ -22,22 +18,17 @@ class ScriptWindow(QMainWindow):
         self.setGeometry(self.ui.geometry())
 
         # Connect buttons
-        self.ui.addTap.clicked.connect(lambda: self.addModule('tap'))
-        self.ui.addPress.clicked.connect(lambda: self.addModule('press'))
-        self.ui.addRelease.clicked.connect(lambda: self.addModule('release'))
-        self.ui.addWait.clicked.connect(lambda: self.addModule('wait'))
-        self.ui.addMoveRelative.clicked.connect(lambda: self.addModule('move-relative'))
-        self.ui.addMoveAbsolute.clicked.connect(lambda: self.addModule('move-absolute'))
-        self.ui.addExec.clicked.connect(lambda: self.addModule('exec'))
-        self.ui.addLoop.clicked.connect(lambda: self.addModule('loop'))
-        self.ui.addIf.clicked.connect(lambda: self.addModule('if'))
-        self.ui.addModifyVariable.clicked.connect(lambda: self.addModule('modify-variable'))
+        self.ui.saveBtn.clicked.connect(self.saveScript)
+        self.ui.runBtn.clicked.connect(self.runScript)
 
-    def addModule(self, moduleType: str) -> None:
-        widget = ModuleWidget(self, moduleType)
-        container = self.ui.scriptAreaContent
-        container.layout().addWidget(widget) # Add the widget
-        container.setMinimumHeight(container.minimumHeight() + 110) # Increase the height of its container
+    def saveScript(self) -> None:
+        scriptData = self.ui.scriptInput.toPlainText()
+        print(scriptData)
+        with open('script.txt', 'w') as f:
+            f.write(scriptData)
+
+    def runScript(self) -> None:
+        print('run script')
 
     def openAsSecondaryWindow(self, parent: QWidget = None) -> None:
         window = ScriptWindow(parent)
