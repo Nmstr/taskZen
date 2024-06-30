@@ -1,16 +1,15 @@
 from PySide6.QtWidgets import QMainWindow, QWidget, QFileDialog
+from PySide6.QtCore import QFile, QObject, Signal, QThread
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile
-import os
-import pty
-import subprocess
 
-from PySide6.QtCore import QObject, Signal, QThread
+import subprocess
+import pty
+import os
 
 class ScriptRunner(QObject):
+    outputUpdated = Signal(str)
     finished = Signal()
     error = Signal(Exception)
-    outputUpdated = Signal(str)
 
     def __init__(self, filepath: str) -> None:
         super().__init__()
@@ -18,33 +17,23 @@ class ScriptRunner(QObject):
 
     def run(self):
         try:
-            # The master_fd is the file descriptor of the master end of the pty
-            # The slave_fd is the file descriptor of the slave end of the pty
             master_fd, slave_fd = pty.openpty()
-
-            # Start the subprocess with the slave end as its controlling terminal
             process = subprocess.Popen(['taskZen', 'execute', '-fv', self.filepath],
                                     stdout=slave_fd, stderr=subprocess.STDOUT, stdin=slave_fd, close_fds=True)
-
-            # Close the slave FD to avoid keeping it open unnecessarily
             os.close(slave_fd)
 
             while True:
-                # Read output from the master end of the pty
                 output = os.read(master_fd, 512)
                 if not output:
                     break
-                #print(output.decode(), end='')
                 self.outputUpdated.emit(output.decode())
 
-            # Wait for the subprocess to finish
-            process.wait()
+            process.wait() # Wait for the subprocess to finish
 
         except Exception as e:
             self.error.emit(e)
         finally:
             self.finished.emit()
-            # Make sure to close the master FD
             os.close(master_fd)
 
 class ScriptWindow(QMainWindow):
@@ -106,7 +95,7 @@ class ScriptWindow(QMainWindow):
         self.thread.finished.connect(self.thread.deleteLater)
         self.scriptRunner.outputUpdated.connect(self.updateSideText)
 
-        # Start the worker when the thread starts
+        # Start the thread
         self.thread.started.connect(self.scriptRunner.run)
         self.thread.start()
 
@@ -114,6 +103,5 @@ class ScriptWindow(QMainWindow):
         self.scriptRunner.finished.connect(lambda: self.ui.runBtn.setDisabled(False))
 
     def updateSideText(self, text):
-        # Update the GUI safely with the new text
         self.outputText += text
         self.ui.sideText.setPlainText(self.outputText)
