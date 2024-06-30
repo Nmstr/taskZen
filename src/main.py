@@ -58,6 +58,8 @@ def main():
     parserServer.add_argument('-s', '--start', action='store_true', help='start the execution server')
     parserServer.add_argument('-k', '--kill', action='store_true', help='kill the execution server')
 
+    parserGui = subparsers.add_parser('gui', help='Start the taskZen GUI')
+    
     args = parser.parse_args()
 
     if args.command is None:
@@ -148,6 +150,19 @@ def main():
 
         else:
             parserServer.print_help()
+    
+    elif args.command in ['gui']:
+        from subprocess import DEVNULL
+        import subprocess
+        script_path = f'{os.path.dirname(os.path.realpath(__file__))}/gui/homeWindow.py'
+        # Start the subprocess in a new session and redirect standard streams to DEVNULL
+        subprocess.Popen(
+            [f"{os.path.join(os.getenv('VIRTUAL_ENV', ''), 'bin/python')}", script_path],
+            start_new_session=True,
+            stdout=DEVNULL,
+            stderr=DEVNULL,
+            stdin=DEVNULL
+        )
 
 if __name__ == '__main__':
     main()
