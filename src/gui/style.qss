@@ -17,6 +17,11 @@ QPushButton:checked {
     border: 1px solid #4d5156;
 }
 
+QPushButton:disabled {
+    background-color: #202327;
+    border: 1px solid #810000;
+}
+
 QTextBrowser {
     background-color: transparent;
 }
