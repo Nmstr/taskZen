@@ -1,7 +1,7 @@
 ---
 layout: page
 title: gui
-permalink: /commandReference/server/
+permalink: /commandReference/gui/
 parent: Command Reference
 nav_order: 400
 ---
