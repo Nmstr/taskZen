@@ -37,6 +37,7 @@ class HomwWindow(QMainWindow):
                 scriptData = yaml.safe_load(open(os.path.expanduser(f"~/.config/taskZen/scripts/{filename}")))
                 scriptEntry = ScriptEntryWidget(scriptData)
                 self.ui.scriptSideContent.layout().addWidget(scriptEntry)
+                self.ui.scriptSideContent.setMinimumHeight(self.ui.scriptSideContent.height() + 75)
 
     def createScript(self) -> None:
         scriptWindow = ScriptWindow()
