@@ -9,7 +9,6 @@ class ScriptEntryWidget(QFrame):
 
         # Set the script data
         self.scriptData = scriptData
-        print(scriptData['name'])
 
         # Load the UI file
         ui_file = QFile("src/gui/homeDisplay/scriptEntry.ui")
