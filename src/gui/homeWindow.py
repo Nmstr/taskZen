@@ -2,7 +2,11 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 
+from homeDisplay.scriptEntry import ScriptEntryWidget
 from scriptWindow import ScriptWindow
+
+import yaml
+import os
 
 class HomwWindow(QMainWindow):
     def __init__(self):
@@ -24,6 +28,15 @@ class HomwWindow(QMainWindow):
 
         # Connect buttons
         self.ui.createScriptBtn.clicked.connect(self.createScript)
+
+        self.loadScripts()
+
+    def loadScripts(self) -> None:
+        for filename in os.listdir(os.path.expanduser("~/.config/taskZen/scripts")):
+            if filename.endswith(".yaml"):
+                scriptData = yaml.safe_load(open(os.path.expanduser(f"~/.config/taskZen/scripts/{filename}")))
+                scriptEntry = ScriptEntryWidget(scriptData)
+                self.ui.scriptSideContent.layout().addWidget(scriptEntry)
 
     def createScript(self) -> None:
         scriptWindow = ScriptWindow()
