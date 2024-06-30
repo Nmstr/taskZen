@@ -4,10 +4,10 @@ from PySide6.QtCore import QFile
 import os
 
 class ScriptWindow(QMainWindow):
-    def __init__(self, parent: QWidget = None) -> None:
+    def __init__(self, parent: QWidget = None, filepath: str = None) -> None:
         super().__init__(parent)
         self.setWindowTitle("taskZen - Script")
-        self.filepath = None
+        self.filepath = filepath
 
         # Load the UI file
         loader = QUiLoader()
@@ -25,6 +25,10 @@ class ScriptWindow(QMainWindow):
 
         self.show()
 
+        # Fill with text
+        if self.filepath is not None:
+            with open(self.filepath, 'r') as f:
+                self.ui.scriptInput.setPlainText(f.read())
 
     def saveScript(self) -> None:
         outputText = 'Saving script...\n'

@@ -8,7 +8,7 @@ from scriptWindow import ScriptWindow
 import yaml
 import os
 
-class HomwWindow(QMainWindow):
+class HomeWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("taskZen - Home")
@@ -34,8 +34,9 @@ class HomwWindow(QMainWindow):
     def loadScripts(self) -> None:
         for filename in os.listdir(os.path.expanduser("~/.config/taskZen/scripts")):
             if filename.endswith(".yaml"):
-                scriptData = yaml.safe_load(open(os.path.expanduser(f"~/.config/taskZen/scripts/{filename}")))
-                scriptEntry = ScriptEntryWidget(scriptData)
+                filepath = os.path.expanduser(f"~/.config/taskZen/scripts/{filename}")
+                scriptData = yaml.safe_load(open(filepath))
+                scriptEntry = ScriptEntryWidget(self, scriptData, filepath)
                 self.ui.scriptSideContent.layout().addWidget(scriptEntry)
                 self.ui.scriptSideContent.setMinimumHeight(self.ui.scriptSideContent.height() + 75)
 
@@ -44,6 +45,6 @@ class HomwWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication([])
-    homeWindow = HomwWindow()
+    homeWindow = HomeWindow()
     homeWindow.show()
     app.exec()
