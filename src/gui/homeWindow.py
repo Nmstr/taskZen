@@ -40,8 +40,7 @@ class HomwWindow(QMainWindow):
                 self.ui.scriptSideContent.setMinimumHeight(self.ui.scriptSideContent.height() + 75)
 
     def createScript(self) -> None:
-        scriptWindow = ScriptWindow()
-        scriptWindow.openAsSecondaryWindow(self)
+        scriptWindow = ScriptWindow(self)
 
 if __name__ == "__main__":
     app = QApplication([])

@@ -23,6 +23,9 @@ class ScriptWindow(QMainWindow):
         self.ui.saveBtn.clicked.connect(self.saveScript)
         self.ui.runBtn.clicked.connect(self.runScript)
 
+        self.show()
+
+
     def saveScript(self) -> None:
         outputText = 'Saving script...\n'
         self.ui.sideText.setText(outputText)
@@ -43,8 +46,3 @@ class ScriptWindow(QMainWindow):
 
     def runScript(self) -> None:
         print('run script')
-
-    def openAsSecondaryWindow(self, parent: QWidget = None) -> None:
-        window = ScriptWindow(parent)
-        window.setWindowTitle(self.windowTitle())
-        window.show()
