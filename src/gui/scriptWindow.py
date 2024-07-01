@@ -18,7 +18,7 @@ class ScriptRunner(QObject):
     def run(self):
         try:
             master_fd, slave_fd = pty.openpty()
-            process = subprocess.Popen(['taskZen', 'execute', '-fv', self.filepath],
+            process = subprocess.Popen(['taskZen', 'execute', '-fvy', self.filepath],
                                     stdout=slave_fd, stderr=subprocess.STDOUT, stdin=slave_fd, close_fds=True)
             os.close(slave_fd)
 

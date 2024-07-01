@@ -71,6 +71,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="runBtn">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use with caution! Execution statements are allowed by default.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string>Run</string>
            </property>
