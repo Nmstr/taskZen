@@ -6,7 +6,7 @@ parent: Command Reference
 nav_order: 400
 ---
 
-# server
+# gui
 
 The `gui` command is used to start the gui. It does not take any arguments. It just starts the gui.
 
