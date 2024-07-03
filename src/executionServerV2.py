@@ -85,7 +85,7 @@ async def getDevice(scriptData, *, writer):
     """
     if allDevices.get(scriptData['name']) is None:
         await sendMessage(f'Device not found. Initializing...', writer=writer)
-        ui = initialize(scriptData)
+        ui = await initialize(scriptData)
         allDevices[scriptData['name']] = ui
         await sendMessage(f'Device initialized.', writer=writer)
     return allDevices[scriptData['name']]
