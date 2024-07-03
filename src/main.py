@@ -25,7 +25,7 @@ def sendInstruction(instruction, *, verbose=True):
         return sock.recv(messageLength).decode('utf-8')
 
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
-        socketPath = '/tmp/taskZen_socket'
+        socketPath = '/tmp/taskZen.sock'
         s.connect(socketPath)
         s.sendall(instruction.encode())
         
