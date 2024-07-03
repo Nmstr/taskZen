@@ -72,7 +72,6 @@ class Svr:
         Raises:
             SystemExit: If the script is not found.
         """
-        print(file, type(file))
         if file == 'True':
             print(f'Using file: {scriptName}')
             scriptPath = scriptName

@@ -1,14 +1,21 @@
+from initialize import initialize, readScript, findScript, getAllKeys
+from executer import Executer
 import asyncio
+import json
 import os
 
 HEADER_LENGTH = 10
-socket_path = '/tmp/taskZen.sock'
+SOCKET_PATH = '/tmp/taskZen.sock'
+verbose = False
 
-async def handleClient(reader, writer):
-    # Read data from the client
-    data = await reader.read(100)
-    message = data.decode()
-    print(f"Received: {message}")
+async def sendMessage(message, requireVerbose=False, *, writer):
+    message = str(message)
+
+    if requireVerbose and verbose == 'False':
+        print(f'Withheld message: {message}')
+        return
+    else:
+        print(f'Send message: {message}')
 
     # Prepare header and message
     messageLength = len(message)
@@ -16,19 +23,103 @@ async def handleClient(reader, writer):
 
     # Send header and message
     writer.write(header + message.encode('utf-8'))
+
     await writer.drain()
 
+async def processInstruction(scriptName, *, writer, file = False, verbose = False, allowExec = False):
+    # Find the script
+    if file == 'True':
+        scriptPath = scriptName
+    else:
+        scriptPath = findScript(scriptName)
+    if scriptPath is None or not os.path.exists(scriptPath):
+        await sendMessage(f'Script {scriptName} not found.', writer=writer)
+        exit(1)
+
+    scriptData = readScript(scriptPath)
+    allKeys = getAllKeys()
+    ui = await getDevice(scriptData, writer=writer)
+
+    executer = Executer(sendMessageFunction=sendMessage, writer=writer, ui=ui, allKeys=allKeys, allowExec=allowExec)
+    await executer.execute(scriptData)
+        
+async def getDevice(scriptData, *, writer):
+    allDevices = {}                                                         # TODO: Make allDevices work (device caching)
+    if allDevices.get(scriptData['name']) is None:
+        await sendMessage(f'Device not found. Initializing...', writer=writer)
+        ui = initialize(scriptData)
+        allDevices[scriptData['name']] = ui
+        await sendMessage(f'Device initialized.', writer=writer)
+    return allDevices[scriptData['name']]
+
+
+
+
+
+async def handleClient(reader, writer):
+    header = await reader.read(HEADER_LENGTH)
+    messageLength = int(header.decode().strip())
+    
+    # Read data from the client
+    data = await reader.read(messageLength)
+    message = data.decode()
+
+    message = json.loads(message)
+
+    print(message)
+    if message['instruction'] == 'ping':
+        await sendMessage('end', writer=writer)
+
+    elif message['instruction'] == 'kill':
+        await sendMessage('end', writer=writer)
+        exit(0)
+
+    elif message['instruction'] == 'killExecution':
+        try:
+            #executer = self.executers[int(instruction.split('-')[1])]
+            #executer.stop()
+            pass
+        except KeyError:
+            #self.sendMessage(f'Execution {instruction.split("-")[1]} not found.', connId=connId)
+            pass
+        except ValueError:
+            #self.sendMessage(f'Invalid execution ID: {instruction.split("-")[1]}', connId=connId)
+            pass
+        #self.sendMessage(f'{instruction} end', connId=connId)
+
+    elif message['instruction'] == 'listRunning':
+        for execution in self.runningExecutions:
+            pass
+            #self.sendMessage(f'{execution[0]}: {execution[1].split("-")[1]}', connId=connId)
+        #self.sendMessage(f'{instruction} end', connId=connId)
+                    
+    elif message['instruction'] == 'execute':
+        #scriptName = instruction.split('-')[1]
+        #allowExec = instruction.split('-')[2]
+        #self.verbose = instruction.split('-')[3]
+        #file = instruction.split('-')[4]
+
+        #self.processInstruction(scriptName, instruction=instruction, connId=connId, allowExec=bool(allowExec), file=file)
+        await processInstruction(message['scriptName'], writer=writer, file=message['file'], verbose=message['verbose'], allowExec=message['allowExec'])
+        print('execute')
+
+    else:
+        pass
+        #self.sendMessage(f'Unknown instruction: {instruction}', connId=connId)
+        #self.sendMessage(f'{instruction} end', connId=connId)
+
     # Close the connection
+    await sendMessage(f'end', writer=writer)
     writer.close()
 
 async def main():
     # Create the Unix socket
     try:
-        os.unlink(socket_path)
+        os.unlink(SOCKET_PATH)
     except OSError:
-        if os.path.exists(socket_path):
+        if os.path.exists(SOCKET_PATH):
             raise
-    server = await asyncio.start_unix_server(handleClient, socket_path)
+    server = await asyncio.start_unix_server(handleClient, SOCKET_PATH)
 
     async with server: # Serve until done
         await server.serve_forever()
@@ -39,4 +130,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Server stopped manually")
     finally:
-        os.unlink(socket_path)
+        os.unlink(SOCKET_PATH)

@@ -2,9 +2,11 @@ from initialize import readScript, findScript, scriptContainsExec
 import argparse
 import socket
 import yaml
+import json
 import os
 
-HEADER_LENGTH = 10  # Adjust the header length to your needs
+HEADER_LENGTH = 10
+SOCKET_PATH = '/tmp/taskZen.sock'
 
 def sendInstruction(instruction, *, verbose=True):
     """
@@ -25,13 +27,14 @@ def sendInstruction(instruction, *, verbose=True):
         return sock.recv(messageLength).decode('utf-8')
 
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
-        socketPath = '/tmp/taskZen.sock'
+        socketPath = SOCKET_PATH
         s.connect(socketPath)
-        s.sendall(instruction.encode())
+        message = f"{len(instruction):<{HEADER_LENGTH}}" + instruction
+        s.sendall(message.encode())
         
         while True:
             response = receiveMessage(s)
-            if response == f'{instruction} end':
+            if response == 'end':
                 break
             if verbose and response:
                 print(response)
@@ -70,7 +73,11 @@ def main():
     elif args.command in ['execute']:
         if args.kill:
             print(f'Killing execution with ID: {args.name}')
-            sendInstruction(f'killExecution-{args.name}')
+            instruction = {
+                'instruction': 'killExecution',
+                'name': args.name
+            }
+            sendInstruction(json.dumps(instruction))
             exit(0)
         print(f'Executing {args.name}')
 
@@ -101,7 +108,15 @@ def main():
                 allowExec = True
 
         try:
-            sendInstruction(f'execute-{args.name}-{allowExec}-{args.verbose}-{args.file}')
+            instruction = {
+                'instruction': 'execute',
+                'scriptName': args.name,
+                'file': args.file,
+                'verbose': args.verbose,
+                'allowExec': allowExec
+            }
+            print(instruction)
+            sendInstruction(json.dumps(instruction))
         except (ConnectionRefusedError, FileNotFoundError):
             print()
             print('Failed to send instruction. Server not running?')
@@ -112,7 +127,10 @@ def main():
         # List running scripts
         if args.running:
             print('Running scripts:')
-            result = sendInstruction('listRunning')
+            instruction = {
+                'instruction': 'listRunning'
+            }
+            result = sendInstruction(json.dumps(instruction))
             exit(0)
         
         # List all scripts
@@ -126,7 +144,10 @@ def main():
         if args.start:
             print('Starting taskZen server')
             try:
-                sendInstruction('ping', verbose=False)
+                instruction = {
+                    'instruction': 'ping'
+                }
+                sendInstruction(json.dumps(instruction))
                 print('Server already running')
             except (ConnectionRefusedError, FileNotFoundError):
                 from subprocess import DEVNULL
@@ -144,7 +165,10 @@ def main():
         elif args.kill:
             print('Killing taskZen server')
             try:
-                sendInstruction('kill', verbose=True)
+                instruction = {
+                    'instruction': 'kill'
+                }
+                sendInstruction(json.dumps(instruction))
             except (ConnectionRefusedError, FileNotFoundError):
                 print('Server not running')
 
