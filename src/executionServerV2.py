@@ -58,10 +58,6 @@ async def getDevice(scriptData, *, writer):
         await sendMessage(f'Device initialized.', writer=writer)
     return allDevices[scriptData['name']]
 
-
-
-
-
 async def handleClient(reader, writer):
     header = await reader.read(HEADER_LENGTH)
     messageLength = int(header.decode().strip())
