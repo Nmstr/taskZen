@@ -36,8 +36,6 @@ async def processInstruction(scriptName, *, writer, file = False, verbose = Fals
         await sendMessage(f'Script {scriptName} not found.', writer=writer)
         exit(1)
 
-    print('a')
-
     scriptData = readScript(scriptPath)
     allKeys = getAllKeys()
     ui = await getDevice(scriptData, writer=writer)
@@ -82,10 +80,7 @@ async def handleClient(reader, writer):
         pass
 
     elif message['instruction'] == 'execute':
-        print('--')
-        #await asyncio.sleep(5)
         await processInstruction(message['scriptName'], writer=writer, file=message['file'], verbose=message['verbose'], allowExec=message['allowExec'])
-        print('execute')
 
     else:
         pass
