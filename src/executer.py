@@ -1,7 +1,6 @@
 from evdev import ecodes as e
 import subprocess
 import asyncio
-import time
 
 class Executer:
     def __init__(self, *, sendMessageFunction, writer, ui, allKeys: dict, allowExec: bool = False) -> None:
@@ -32,7 +31,7 @@ class Executer:
             - sleepTime (int): The amount of time to sleep in milliseconds
         """
         sleepTime = await self.retrieveValue(sleepTime)
-        time.sleep(sleepTime / 1000)
+        await asyncio.sleep(sleepTime / 1000)
 
     async def actionPressKey(self, key: str) -> None:
         """
@@ -173,7 +172,7 @@ class Executer:
             
             await self.executeIteration(step)
 
-        time.sleep(0.1) # Let the device process the events
+        await asyncio.sleep(0.1) # Let the device process the events
 
     async def executeIteration(self, step: dict) -> None:
         """
@@ -221,7 +220,7 @@ class Executer:
                     await self.sendMessage(f'-> {subStep}', writer=self.writer)
                     await self.executeIteration(subStep)
 
-        time.sleep(self.executionSpeed / 1000)
+        await asyncio.sleep(self.executionSpeed / 1000)
 
     async def evaluateCondition(self, operation: str, value1, value2 = None) -> bool:
         """

@@ -36,6 +36,8 @@ async def processInstruction(scriptName, *, writer, file = False, verbose = Fals
         await sendMessage(f'Script {scriptName} not found.', writer=writer)
         exit(1)
 
+    print('a')
+
     scriptData = readScript(scriptPath)
     allKeys = getAllKeys()
     ui = await getDevice(scriptData, writer=writer)
@@ -72,41 +74,21 @@ async def handleClient(reader, writer):
 
     elif message['instruction'] == 'kill':
         await sendMessage('end', writer=writer)
-        exit(0)
 
     elif message['instruction'] == 'killExecution':
-        try:
-            #executer = self.executers[int(instruction.split('-')[1])]
-            #executer.stop()
-            pass
-        except KeyError:
-            #self.sendMessage(f'Execution {instruction.split("-")[1]} not found.', connId=connId)
-            pass
-        except ValueError:
-            #self.sendMessage(f'Invalid execution ID: {instruction.split("-")[1]}', connId=connId)
-            pass
-        #self.sendMessage(f'{instruction} end', connId=connId)
+        pass
 
     elif message['instruction'] == 'listRunning':
-        for execution in self.runningExecutions:
-            pass
-            #self.sendMessage(f'{execution[0]}: {execution[1].split("-")[1]}', connId=connId)
-        #self.sendMessage(f'{instruction} end', connId=connId)
-                    
-    elif message['instruction'] == 'execute':
-        #scriptName = instruction.split('-')[1]
-        #allowExec = instruction.split('-')[2]
-        #self.verbose = instruction.split('-')[3]
-        #file = instruction.split('-')[4]
+        pass
 
-        #self.processInstruction(scriptName, instruction=instruction, connId=connId, allowExec=bool(allowExec), file=file)
+    elif message['instruction'] == 'execute':
+        print('--')
+        #await asyncio.sleep(5)
         await processInstruction(message['scriptName'], writer=writer, file=message['file'], verbose=message['verbose'], allowExec=message['allowExec'])
         print('execute')
 
     else:
         pass
-        #self.sendMessage(f'Unknown instruction: {instruction}', connId=connId)
-        #self.sendMessage(f'{instruction} end', connId=connId)
 
     # Close the connection
     await sendMessage(f'end', writer=writer)
