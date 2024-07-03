@@ -72,12 +72,17 @@ def main():
 
     elif args.command in ['execute']:
         if args.kill:
-            print(f'Killing execution with ID: {args.name}')
+            print(f'Killing execution of script: {args.name}')
             instruction = {
                 'instruction': 'killExecution',
                 'scriptName': args.name
             }
-            sendInstruction(json.dumps(instruction))
+            try:
+                sendInstruction(json.dumps(instruction))
+            except (ConnectionRefusedError, FileNotFoundError):
+                print()
+                print('Failed to send instruction. Server not running?')
+                print('You can start the server using `taskZen server -s`')
             exit(0)
         print(f'Executing {args.name}')
 
