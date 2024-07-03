@@ -26,7 +26,7 @@ async def sendMessage(message, requireVerbose=False, *, writer):
     """
     message = str(message)
 
-    if requireVerbose and verbose == 'False':
+    if requireVerbose and verbose is False:
         print(f'Withheld message: {message}')
         return
     else:
@@ -41,7 +41,7 @@ async def sendMessage(message, requireVerbose=False, *, writer):
 
     await writer.drain()
 
-async def processInstruction(scriptName, *, writer, file = False, verbose = False, allowExec = False):
+async def processInstruction(scriptName, *, writer, file = False, allowExec = False):
     """
     Processes an instruction to execute a script.
     Asumes that the script exists. This should have been verified by the client.
@@ -140,7 +140,10 @@ async def handleClient(reader, writer):
             await sendMessage(f'{execution}', writer=writer)
 
     elif message['instruction'] == 'execute':
-        await processInstruction(message['scriptName'], writer=writer, file=message['file'], verbose=message['verbose'], allowExec=message['allowExec'])
+        global verbose
+        verbose = message['verbose']
+
+        await processInstruction(message['scriptName'], writer=writer, file=message['file'], allowExec=message['allowExec'])
 
     # Close the connection
     await sendMessage(f'end', writer=writer)

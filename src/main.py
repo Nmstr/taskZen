@@ -115,7 +115,6 @@ def main():
                 'verbose': args.verbose,
                 'allowExec': allowExec
             }
-            print(instruction)
             sendInstruction(json.dumps(instruction))
         except (ConnectionRefusedError, FileNotFoundError):
             print()

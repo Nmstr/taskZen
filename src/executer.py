@@ -148,7 +148,7 @@ class Executer:
         elif operation == 'divide':
             self.variableData[variable] /= await self.retrieveValue(value)
 
-        await self.sendMessage(f'Variable Modified: {variable} {operation} {value} -> {self.variableData[variable]}', writer=self.writer)
+        await self.sendMessage(f'Variable Modified: {variable} {operation} {value} -> {self.variableData[variable]}', True, writer=self.writer)
 
     async def execute(self, scriptData: dict) -> None:
         """
@@ -168,7 +168,7 @@ class Executer:
 
         # Execute the script
         for step in self.scriptData['steps']:
-            await self.sendMessage(step, writer=self.writer)
+            await self.sendMessage(step, True, writer=self.writer)
             
             await self.executeIteration(step)
 
@@ -204,20 +204,20 @@ class Executer:
         elif step['type'] == 'loop':
             for _ in range(await self.retrieveValue(step['value'])):
                 for subStep in step['subSteps']:    
-                    await self.sendMessage(f'-> {subStep}', writer=self.writer)
+                    await self.sendMessage(f'-> {subStep}', True, writer=self.writer)
                     await self.executeIteration(subStep)
         elif step['type'] == 'if':
             if await self.evaluateCondition(step['operation'], step['value1'], step.get('value2', None)):
                 if 'trueSteps' not in step: # If there are no true steps, return
                     return
                 for subStep in step['trueSteps']:    
-                    await self.sendMessage(f'-> {subStep}', writer=self.writer)
+                    await self.sendMessage(f'-> {subStep}', True, writer=self.writer)
                     await self.executeIteration(subStep)
             else:
                 if 'falseSteps' not in step: # If there are no true steps, return
                     return
                 for subStep in step['falseSteps']:    
-                    await self.sendMessage(f'-> {subStep}', writer=self.writer)
+                    await self.sendMessage(f'-> {subStep}', True, writer=self.writer)
                     await self.executeIteration(subStep)
 
         await asyncio.sleep(self.executionSpeed / 1000)
@@ -246,7 +246,7 @@ class Executer:
         if value2 is not None:
             value2 = await self.retrieveValue(value2)
             
-        await self.sendMessage(f'Condition: {value1} ({type(value1)}) {operation} {value2} ({type(value2)})', writer=self.writer)
+        await self.sendMessage(f'Condition: {value1} ({type(value1)}) {operation} {value2} ({type(value2)})', True, writer=self.writer)
 
         # Evaluate condition
         if operation == 'bool':
@@ -284,11 +284,11 @@ class Executer:
             return value
         
         if value.startswith('$'):
-            await self.sendMessage(f'Variable -> {value}: {self.variableData.get(value[1:])}', writer=self.writer)
+            await self.sendMessage(f'Variable -> {value}: {self.variableData.get(value[1:])}', True, writer=self.writer)
             return self.variableData.get(value[1:])
         
         elif value.startswith('-$'): # Invert variable
-            await self.sendMessage(f'Variable -> {value[1:]}: {-self.variableData.get(value[2:])}', writer=self.writer)
+            await self.sendMessage(f'Variable -> {value[1:]}: {-self.variableData.get(value[2:])}', True, writer=self.writer)
             return -self.variableData.get(value[2:])
         
         return value
