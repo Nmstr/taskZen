@@ -9,6 +9,7 @@ HEADER_LENGTH = 10
 SOCKET_PATH = '/tmp/taskZen.sock'
 
 runningExecutions = {}
+allDevices = {}
 verbose = False
 
 async def sendMessage(message, requireVerbose=False, *, writer):
@@ -50,7 +51,6 @@ async def processInstruction(scriptName, *, writer, file = False, verbose = Fals
     runningExecutions.pop(scriptName)
         
 async def getDevice(scriptData, *, writer):
-    allDevices = {}                                                         # TODO: Make allDevices work (device caching)
     if allDevices.get(scriptData['name']) is None:
         await sendMessage(f'Device not found. Initializing...', writer=writer)
         ui = initialize(scriptData)
