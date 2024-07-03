@@ -13,14 +13,24 @@ allDevices = {}
 verbose = False
 
 async def sendMessage(message, requireVerbose=False, *, writer):
+    """
+    Asynchronously sends a message to a writer.
+
+    Args:
+        message (str): The message to send.
+        requireVerbose (bool, optional): Whether the message should be sent only if verbose is True. Defaults to False.
+        writer (asyncio.StreamWriter): The writer to send the message to.
+
+    Returns:
+        None
+    """
     message = str(message)
 
     if requireVerbose and verbose == 'False':
         print(f'Withheld message: {message}')
         return
     else:
-        pass
-        #print(f'Send message: {message}')
+        print(f'Send message: {message}')
 
     # Prepare header and message
     messageLength = len(message)
@@ -32,14 +42,25 @@ async def sendMessage(message, requireVerbose=False, *, writer):
     await writer.drain()
 
 async def processInstruction(scriptName, *, writer, file = False, verbose = False, allowExec = False):
+    """
+    Processes an instruction to execute a script.
+    Asumes that the script exists. This should have been verified by the client.
+
+    Args:
+        scriptName (str): The name of the script to execute.
+        writer (asyncio.StreamWriter): The writer to send messages to.
+        file (bool, optional): Whether to use script name or file path. Defaults to False.
+        verbose (bool, optional): Whether to print verbose messages. Defaults to False.
+        allowExec (bool, optional): Whether to allow execution of exec statements. Defaults to False.
+
+    Returns:
+        None
+    """
     # Find the script
     if file == 'True':
         scriptPath = scriptName
     else:
         scriptPath = findScript(scriptName)
-    if scriptPath is None or not os.path.exists(scriptPath):
-        await sendMessage(f'Script {scriptName} not found.', writer=writer)
-        exit(1)
 
     scriptData = readScript(scriptPath)
     allKeys = getAllKeys()
@@ -51,6 +72,17 @@ async def processInstruction(scriptName, *, writer, file = False, verbose = Fals
     runningExecutions.pop(scriptName)
         
 async def getDevice(scriptData, *, writer):
+    """
+    Retrieves a device from the `allDevices` dictionary based on the provided `scriptData['name']`.
+    If the device is not found, it initializes the device using the `initialize` function and adds it to the `allDevices` dictionary.
+
+    Parameters:
+        scriptData (dict): The script data containing the device name.
+        writer: The asyncio.StreamWriter to send messages to.
+
+    Returns:
+        Any: The device corresponding to the provided `scriptData['name']`.
+    """
     if allDevices.get(scriptData['name']) is None:
         await sendMessage(f'Device not found. Initializing...', writer=writer)
         ui = initialize(scriptData)
@@ -59,6 +91,25 @@ async def getDevice(scriptData, *, writer):
     return allDevices[scriptData['name']]
 
 async def handleClient(reader, writer):
+    """
+    Asynchronously handles a client connection by reading its instructions and executing them.
+    
+    The supported instructions are:
+    - 'ping': Sends a response indicating the end of the message.
+    - 'kill': Sends a response indicating the end of the message and exits the program.
+    - 'killExecution': Stops the execution of the specified script if it is currently running.
+    - 'listRunning': Prints the list of currently running executions and sends each execution 
+      as a response.
+    - 'execute': Processes the instruction by executing the specified script with the given 
+      parameters.
+    
+    Parameters:
+        reader (asyncio.StreamReader): The reader object for reading data from the client.
+        writer (asyncio.StreamWriter): The writer object for sending data to the client.
+    
+    Returns:
+        None
+    """
     header = await reader.read(HEADER_LENGTH)
     messageLength = int(header.decode().strip())
     
@@ -96,6 +147,15 @@ async def handleClient(reader, writer):
     writer.close()
 
 async def main():
+    """
+    Asynchronously creates a Unix socket and starts serving it until done.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+    """
     # Create the Unix socket
     try:
         os.unlink(SOCKET_PATH)
