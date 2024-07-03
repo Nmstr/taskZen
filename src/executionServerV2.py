@@ -72,6 +72,7 @@ async def handleClient(reader, writer):
 
     elif message['instruction'] == 'kill':
         await sendMessage('end', writer=writer)
+        exit(0)
 
     elif message['instruction'] == 'killExecution':
         pass
