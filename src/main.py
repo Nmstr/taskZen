@@ -75,7 +75,7 @@ def main():
             print(f'Killing execution with ID: {args.name}')
             instruction = {
                 'instruction': 'killExecution',
-                'name': args.name
+                'scriptName': args.name
             }
             sendInstruction(json.dumps(instruction))
             exit(0)

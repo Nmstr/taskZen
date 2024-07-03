@@ -28,7 +28,7 @@ Recap:
 
 ## -r / --running
 
-The `-r` or `--running` option can be used to only show scripts that are currently running. It will display both the name of the script and the id of the execution.
+The `-r` or `--running` option can be used to only show scripts that are currently running. It will display the name of the script running.
 
 The output will look similar to this:
 ```
@@ -37,10 +37,10 @@ $ taskZen ls -r
 Automation utility for Wayland
 
 Running scripts:
-4: exampleKeyboard
-6: exampleMouse
+exampleKeyboard
+exampleMouse
 ```
 
 Recap:
 - Lists all running scripts
-- Shows names and IDs.
+- Shows their names

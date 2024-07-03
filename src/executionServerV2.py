@@ -1,5 +1,6 @@
 from initialize import initialize, readScript, findScript, getAllKeys
 from executer import Executer
+import datetime
 import asyncio
 import json
 import os
@@ -7,8 +8,8 @@ import os
 HEADER_LENGTH = 10
 SOCKET_PATH = '/tmp/taskZen.sock'
 
+runningExecutions = {}
 verbose = False
-runningExecutions = []
 
 async def sendMessage(message, requireVerbose=False, *, writer):
     message = str(message)
@@ -44,7 +45,9 @@ async def processInstruction(scriptName, *, writer, file = False, verbose = Fals
     ui = await getDevice(scriptData, writer=writer)
 
     executer = Executer(sendMessageFunction=sendMessage, writer=writer, ui=ui, allKeys=allKeys, allowExec=allowExec)
+    runningExecutions[scriptName] = {'executer': executer, 'creationTime': datetime.datetime.now()}
     await executer.execute(scriptData)
+    runningExecutions.pop(scriptName)
         
 async def getDevice(scriptData, *, writer):
     allDevices = {}                                                         # TODO: Make allDevices work (device caching)
@@ -78,18 +81,19 @@ async def handleClient(reader, writer):
         exit(0)
 
     elif message['instruction'] == 'killExecution':
-        pass
+        try:
+            runningExecutions[message['scriptName']]['executer'].stop()
+        except KeyError:
+            await sendMessage('Error: Execution not found', writer=writer)
 
     elif message['instruction'] == 'listRunning':
         print(runningExecutions)
         for execution in runningExecutions:
             print(execution)
-            await sendMessage(f'{execution[0]}', writer=writer)
+            await sendMessage(f'{execution}', writer=writer)
 
     elif message['instruction'] == 'execute':
-        runningExecutions.append([message['scriptName'], writer])
         await processInstruction(message['scriptName'], writer=writer, file=message['file'], verbose=message['verbose'], allowExec=message['allowExec'])
-        runningExecutions.remove([message['scriptName'], writer])
 
     else:
         pass
