@@ -95,9 +95,6 @@ async def handleClient(reader, writer):
     elif message['instruction'] == 'execute':
         await processInstruction(message['scriptName'], writer=writer, file=message['file'], verbose=message['verbose'], allowExec=message['allowExec'])
 
-    else:
-        pass
-
     # Close the connection
     await sendMessage(f'end', writer=writer)
     writer.close()
