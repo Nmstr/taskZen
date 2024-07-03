@@ -1,8 +1,9 @@
 from evdev import UInput, ecodes as e, AbsInfo
+import asyncio
 import yaml
 import os
 
-def initialize(scriptData: dict):
+async def initialize(scriptData: dict):
     # Create the allKeys dictionary
     allKeys = getAllKeys()
         

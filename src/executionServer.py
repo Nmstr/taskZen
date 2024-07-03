@@ -1,201 +1,179 @@
 from initialize import initialize, readScript, findScript, getAllKeys
 from executer import Executer
-import threading
-import socket
+import datetime
+import asyncio
+import json
 import os
 
-serverAddress = '/tmp/taskZen_socket'
 HEADER_LENGTH = 10
+SOCKET_PATH = '/tmp/taskZen.sock'
 
-class Svr:
-    def __init__(self):
-        self.allDevices = {}
-        self.verbose = False
-        self.connections = {}
-        self.connectionId = 0
-        self.lock = threading.Lock()
-        self.runningExecutions = []
-        self.executers = {}
+runningExecutions = {}
+allDevices = {}
+verbose = False
 
-    def sendMessage(self, message, requireVerbose=False, *, connId):
-        """
-        Sends a message to a specific connection.
-        Args:
-            message (str): The message to be sent.
-            requireVerbose (bool, optional): Flag to indicate if the message should be printed.
-                Defaults to False.
-            connId (int): The ID of the connection to send the message to.
-        Returns:
-            None
-        """
-        if requireVerbose and self.verbose == 'False':
-            print(f'withheld message: {message}')
-            return
-        message = str(message)
-        messageLength = len(message)
-        header = f"{messageLength:<{HEADER_LENGTH}}".encode('utf-8')
-        with self.lock:
-            conn = self.connections[connId]
-            conn.sendall(header + message.encode('utf-8'))
-        print(message)
+async def sendMessage(message, requireVerbose=False, *, writer):
+    """
+    Asynchronously sends a message to a writer.
 
-    def getDevice(self, scriptData, *, connId):
-        """
-        Retrieves a device from the `allDevices` dictionary based on the provided `scriptData['name']`.
-        If the device is not found, it initializes the device using the `initialize` function and adds it to the `allDevices` dictionary.
-        Parameters:
-            scriptData (dict): The script data containing the device name.
-            connId (int): The connection ID.
-        Returns:
-            Any: The device corresponding to the provided `scriptData['name']`.
-        """
-        if self.allDevices.get(scriptData['name']) is None:
-            self.sendMessage(f'Device not found. Initializing...', True, connId=connId)
-            ui = initialize(scriptData)
-            self.allDevices[scriptData['name']] = ui
-            self.sendMessage(f'Device initialized.', True, connId=connId)
-        return self.allDevices[scriptData['name']]
+    Args:
+        message (str): The message to send.
+        requireVerbose (bool, optional): Whether the message should be sent only if verbose is True. Defaults to False.
+        writer (asyncio.StreamWriter): The writer to send the message to.
 
-    def processInstruction(self, scriptName, *, instruction = None, connId = None, allowExec = False, file = False):
-        """
-        Process an instruction by executing a script.
+    Returns:
+        None
+    """
+    message = str(message)
 
-        Args:
-            scriptName (str): The name of the script to execute.
-            instruction (str, optional): The instruction to execute. Defaults to None.
-            connId (int, optional): The connection ID. Defaults to None.
-            allowExec (bool, optional): Whether to allow execution. Defaults to False.
+    if requireVerbose and verbose is False:
+        print(f'Withheld message: {message}')
+        return
+    else:
+        print(f'Send message: {message}')
 
-        Returns:
-            None
+    # Prepare header and message
+    messageLength = len(message)
+    header = f"{messageLength:<{HEADER_LENGTH}}".encode('utf-8')
 
-        Raises:
-            SystemExit: If the script is not found.
-        """
-        print(file, type(file))
-        if file == 'True':
-            print(f'Using file: {scriptName}')
-            scriptPath = scriptName
-        else:
-            scriptPath = findScript(scriptName)
-        if scriptPath is None or not os.path.exists(scriptPath):
-            self.sendMessage(f'Script {scriptName} not found.', connId=connId)
-            exit(1)
+    # Send header and message
+    writer.write(header + message.encode('utf-8'))
 
-        scriptData = readScript(scriptPath)
-        allKeys = getAllKeys()
+    await writer.drain()
+
+async def processInstruction(scriptName, *, writer, file = False, allowExec = False):
+    """
+    Processes an instruction to execute a script.
+    Asumes that the script exists. This should have been verified by the client.
+
+    Args:
+        scriptName (str): The name of the script to execute.
+        writer (asyncio.StreamWriter): The writer to send messages to.
+        file (bool, optional): Whether to use script name or file path. Defaults to False.
+        verbose (bool, optional): Whether to print verbose messages. Defaults to False.
+        allowExec (bool, optional): Whether to allow execution of exec statements. Defaults to False.
+
+    Returns:
+        None
+    """
+    # Find the script
+    if file == 'True':
+        scriptPath = scriptName
+    else:
+        scriptPath = findScript(scriptName)
+
+    scriptData = readScript(scriptPath)
+    allKeys = getAllKeys()
+    ui = await getDevice(scriptData, writer=writer)
+
+    executer = Executer(sendMessageFunction=sendMessage, writer=writer, ui=ui, allKeys=allKeys, allowExec=allowExec)
+    runningExecutions[scriptName] = {'executer': executer, 'creationTime': datetime.datetime.now()}
+    await executer.execute(scriptData)
+    runningExecutions.pop(scriptName)
         
-        def executeScript():
-            self.runningExecutions.append([connId, instruction])
-            ui = self.getDevice(scriptData, connId=connId)
-            executer = Executer(parent=self, connId=connId, ui=ui, allKeys=allKeys, allowExec=allowExec)
-            self.executers[connId] = executer
-            executer.execute(scriptData)
-            self.runningExecutions.remove([connId, instruction])
-            self.executers.pop(connId)
-            self.sendMessage(f'{instruction} end', connId=connId)
-        
-        executionThread = threading.Thread(target=executeScript)
-        executionThread.start()
+async def getDevice(scriptData, *, writer):
+    """
+    Retrieves a device from the `allDevices` dictionary based on the provided `scriptData['name']`.
+    If the device is not found, it initializes the device using the `initialize` function and adds it to the `allDevices` dictionary.
 
-    def sessionServer(self, socketPath=serverAddress):
-        """
-        Start a session server that listens for incoming connections on the specified socket path.
+    Parameters:
+        scriptData (dict): The script data containing the device name.
+        writer: The asyncio.StreamWriter to send messages to.
 
-        Parameters:
-            socketPath (str): The path of the socket to listen on. Defaults to serverAddress.
+    Returns:
+        Any: The device corresponding to the provided `scriptData['name']`.
+    """
+    if allDevices.get(scriptData['name']) is None:
+        await sendMessage(f'Device not found. Initializing...', writer=writer)
+        ui = await initialize(scriptData)
+        allDevices[scriptData['name']] = ui
+        await sendMessage(f'Device initialized.', writer=writer)
+    return allDevices[scriptData['name']]
 
-        Returns:
-            None
+async def handleClient(reader, writer):
+    """
+    Asynchronously handles a client connection by reading its instructions and executing them.
+    
+    The supported instructions are:
+    - 'ping': Sends a response indicating the end of the message.
+    - 'kill': Sends a response indicating the end of the message and exits the program.
+    - 'killExecution': Stops the execution of the specified script if it is currently running.
+    - 'listRunning': Prints the list of currently running executions and sends each execution 
+      as a response.
+    - 'execute': Processes the instruction by executing the specified script with the given 
+      parameters.
+    
+    Parameters:
+        reader (asyncio.StreamReader): The reader object for reading data from the client.
+        writer (asyncio.StreamWriter): The writer object for sending data to the client.
+    
+    Returns:
+        None
+    """
+    header = await reader.read(HEADER_LENGTH)
+    messageLength = int(header.decode().strip())
+    
+    # Read data from the client
+    data = await reader.read(messageLength)
+    message = data.decode()
 
-        Raises:
-            OSError: If the socket path already exists and cannot be unlinked.
+    message = json.loads(message)
 
-        Note:
-            This function is typically called once to start the session server.
-        """
-        # Make sure the socket does not already exist
+    print(message)
+    if message['instruction'] == 'ping':
+        await sendMessage('end', writer=writer)
+
+    elif message['instruction'] == 'kill':
+        await sendMessage('end', writer=writer)
+        exit(0)
+
+    elif message['instruction'] == 'killExecution':
         try:
-            os.unlink(socketPath)
-        except OSError:
-            if os.path.exists(socketPath):
-                raise
+            runningExecutions[message['scriptName']]['executer'].stop()
+        except KeyError:
+            await sendMessage('Error: Execution not found', writer=writer)
 
-        print(f"Listening on {socketPath}")
-        
-        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
-            s.bind(socketPath)
-            s.listen()
-            while True:
-                conn, addr = s.accept()
-                with self.lock:
-                    self.connectionId += 1
-                    connId = self.connectionId
-                    self.connections[connId] = conn
-                
-                thread = threading.Thread(target=self.handleConnection, args=(connId,))
-                thread.start()
+    elif message['instruction'] == 'listRunning':
+        print(runningExecutions)
+        for execution in runningExecutions:
+            print(execution)
+            await sendMessage(f'{execution}', writer=writer)
 
-    def handleConnection(self, connId):
-        """
-        This function handles a connection from a client. It receives instructions from the client and performs
-        the corresponding actions.
+    elif message['instruction'] == 'execute':
+        global verbose
+        verbose = message['verbose']
 
-        Args:
-            connId (int): The connection ID.
+        await processInstruction(message['scriptName'], writer=writer, file=message['file'], allowExec=message['allowExec'])
 
-        Returns:
-            None
+    # Close the connection
+    await sendMessage(f'end', writer=writer)
+    writer.close()
 
-        Raises:
-            None
-        """
-        try:
-            conn = self.connections[connId]
-            while True:
-                instruction = conn.recv(1024).decode()
-                if not instruction:
-                    break
-                print(f'Received instruction: {instruction}')
+async def main():
+    """
+    Asynchronously creates a Unix socket and starts serving it until done.
 
-                if instruction == 'ping':
-                    self.sendMessage(f'{instruction} end', connId=connId)
+    Parameters:
+        None
 
-                elif instruction == 'kill':
-                    self.sendMessage(f'{instruction} end', connId=connId)
-                    break
+    Returns:
+        None
+    """
+    # Create the Unix socket
+    try:
+        os.unlink(SOCKET_PATH)
+    except OSError:
+        if os.path.exists(SOCKET_PATH):
+            raise
+    server = await asyncio.start_unix_server(handleClient, SOCKET_PATH)
 
-                elif instruction.split('-')[0] == 'killExecution':
-                    try:
-                        executer = self.executers[int(instruction.split('-')[1])]
-                        executer.stop()
-                    except KeyError:
-                        self.sendMessage(f'Execution {instruction.split("-")[1]} not found.', connId=connId)
-                    except ValueError:
-                        self.sendMessage(f'Invalid execution ID: {instruction.split("-")[1]}', connId=connId)
-                    self.sendMessage(f'{instruction} end', connId=connId)
-
-                elif instruction == 'listRunning':
-                    for execution in self.runningExecutions:
-                        self.sendMessage(f'{execution[0]}: {execution[1].split("-")[1]}', connId=connId)
-                    self.sendMessage(f'{instruction} end', connId=connId)
-                    
-                elif instruction.split('-')[0] == 'execute':
-                    scriptName = instruction.split('-')[1]
-                    allowExec = instruction.split('-')[2]
-                    self.verbose = instruction.split('-')[3]
-                    file = instruction.split('-')[4]
-
-                    self.processInstruction(scriptName, instruction=instruction, connId=connId, allowExec=bool(allowExec), file=file)
-
-                else:
-                    self.sendMessage(f'Unknown instruction: {instruction}', connId=connId)
-                    self.sendMessage(f'{instruction} end', connId=connId)
-        finally:
-            with self.lock:
-                conn = self.connections.pop(connId)
-                conn.close()
+    async with server: # Serve until done
+        await server.serve_forever()
 
 if __name__ == "__main__":
-    server = Svr()
-    server.sessionServer()
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("Server stopped manually")
+    finally:
+        os.unlink(SOCKET_PATH)

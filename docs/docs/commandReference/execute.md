@@ -62,7 +62,7 @@ Recap:
 
 ## -k / --kill
 
-The `-k` or `--kill` option can be used to kill the running script. It will take the ID of the execution to kill as an input. You can find the IDs of the running scripts using the [list](https://nmstr.github.io/taskZen/commandReference/list/) command.
+The `-k` or `--kill` option can be used to kill the running script. It will take the name of the running script to kill as an input. You can find the names of all running scripts using the [list -r](https://nmstr.github.io/taskZen/commandReference/list/) command.
 
 Recap:
-- Kills a running script using its ID
+- Kills a running script using its name
