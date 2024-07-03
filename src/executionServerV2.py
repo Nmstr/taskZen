@@ -6,7 +6,9 @@ import os
 
 HEADER_LENGTH = 10
 SOCKET_PATH = '/tmp/taskZen.sock'
+
 verbose = False
+runningExecutions = []
 
 async def sendMessage(message, requireVerbose=False, *, writer):
     message = str(message)
@@ -15,7 +17,8 @@ async def sendMessage(message, requireVerbose=False, *, writer):
         print(f'Withheld message: {message}')
         return
     else:
-        print(f'Send message: {message}')
+        pass
+        #print(f'Send message: {message}')
 
     # Prepare header and message
     messageLength = len(message)
@@ -78,10 +81,15 @@ async def handleClient(reader, writer):
         pass
 
     elif message['instruction'] == 'listRunning':
-        pass
+        print(runningExecutions)
+        for execution in runningExecutions:
+            print(execution)
+            await sendMessage(f'{execution[0]}', writer=writer)
 
     elif message['instruction'] == 'execute':
+        runningExecutions.append([message['scriptName'], writer])
         await processInstruction(message['scriptName'], writer=writer, file=message['file'], verbose=message['verbose'], allowExec=message['allowExec'])
+        runningExecutions.remove([message['scriptName'], writer])
 
     else:
         pass
