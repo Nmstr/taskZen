@@ -14,16 +14,13 @@ taskZen is a free and open source automation software for Wayland!
 
 ```
 ## Features
-- Create scripts to automate the boring stuff
+- Create scripts for automating tasks
 - Include mouse movements, button presses, commands and much more in your scripts
-- Quickly list all your available scripts
+- Simple GUI interface to create and edit scripts
 - Full Wayland compatability out of the box
+- Fully Free and Open Source
 
 # Installation Instructions
-
-## Run from Source
-
-This section describes how to run taskZen directly from the source code.
 
 Prerequisites: Make sure you have Python, pip, and git installed on your system.
 
@@ -47,9 +44,7 @@ Prerequisites: Make sure you have Python, pip, and git installed on your system.
 
 `taskZen`
 
-6. (Optional) Clone the example scripts into the scripts directory
-
-`cp -r ../examples/* ~/.config/taskZen/scripts/`
+For more information abput the installation, visit the documentation [here](https://nmstr.github.io/taskZen/installation).
 
 # Authors
 

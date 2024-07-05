@@ -5,6 +5,7 @@ version: 1
 keys:
   - KEY_LEFTSHIFT
   - KEY_LEFTMETA
+  - KEY_LEFTCTRL
   - KEY_LEFTALT
   - KEY_SPACE
   - KEY_ENTER
