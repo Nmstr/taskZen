@@ -1,17 +1,7 @@
 name: exampleKeyboard
 speed: 100
-keys: 
-  - KEY_LEFTSHIFT
-  - KEY_LEFTMETA
-  - KEY_SPACE
-  - KEY_1
-  - KEY_H
-  - KEY_E
-  - KEY_L
-  - KEY_O
-  - KEY_W
-  - KEY_R
-  - KEY_D
+device: taskZen-minimal
+device-version: 1
 screen:
   width: 1920
   height: 1080

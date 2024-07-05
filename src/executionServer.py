@@ -64,7 +64,13 @@ async def processInstruction(scriptName, *, writer, file = False, allowExec = Fa
 
     scriptData = readScript(scriptPath)
     allKeys = getAllKeys()
-    ui = await getDevice(scriptData, writer=writer)
+    ui, error = await getDevice(scriptData, writer=writer)
+
+    if not ui: # Failed to initialize
+        await sendMessage(f'Failed to initialize device.', writer=writer)
+        await sendMessage(f'Error: {error}', writer=writer)
+        return
+    await sendMessage(f'Device initialized.', writer=writer)
 
     executer = Executer(sendMessageFunction=sendMessage, writer=writer, ui=ui, allKeys=allKeys, allowExec=allowExec)
     runningExecutions[scriptName] = {'executer': executer, 'creationTime': datetime.datetime.now()}
@@ -83,12 +89,12 @@ async def getDevice(scriptData, *, writer):
     Returns:
         Any: The device corresponding to the provided `scriptData['name']`.
     """
+    error = None
     if allDevices.get(scriptData['name']) is None:
         await sendMessage(f'Device not found. Initializing...', writer=writer)
-        ui = await initialize(scriptData)
+        ui, error = await initialize(scriptData)
         allDevices[scriptData['name']] = ui
-        await sendMessage(f'Device initialized.', writer=writer)
-    return allDevices[scriptData['name']]
+    return allDevices[scriptData['name']], error
 
 async def handleClient(reader, writer):
     """

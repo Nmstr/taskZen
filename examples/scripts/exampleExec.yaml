@@ -1,7 +1,6 @@
 name: exampleExec
 speed: 100
-keys:
-  - KEY_ENTER
+device: taskZen-minimal
 screen:
   width: 1920
   height: 1080

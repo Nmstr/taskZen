@@ -1,7 +1,6 @@
 name: exampleMouse
 speed: 1
-keys: 
-  - BTN_MOUSE
+device: taskZen-minimal
 screen:
   width: 1920
   height: 1080

@@ -3,12 +3,42 @@ import yaml
 import os
 
 async def initialize(scriptData: dict):
+    # Find all matching devices
+    deviceDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/devices/'
+    foundDevices = []
+    for file in os.listdir(deviceDir):
+        with open(deviceDir + file, 'r') as f:
+            deviceData = yaml.safe_load(f)
+        if scriptData['device'] == deviceData['name']:
+            foundDevices.append(file)
+
+    finalDevice = None
+    # Match the version
+    if scriptData.get('device-version') is None: # Get newest version
+        foundDevicesData = []
+        for device in foundDevices:
+            with open(deviceDir + device, 'r') as f:
+                device = yaml.safe_load(f)
+            foundDevicesData.append(device)
+        finalDevice = max(foundDevicesData, key=lambda x: x['version'])
+
+    else: # Get matching version
+        for device in foundDevices:
+            with open(deviceDir + device, 'r') as f:
+                deviceData = yaml.safe_load(f)
+            if deviceData['version'] == scriptData.get('device-version'):
+                finalDevice = deviceData
+                break
+
+    if finalDevice is None:
+        return None, 'Device not found'
+
     # Create the allKeys dictionary
     allKeys = getAllKeys()
         
     # Create the key list
     keyList = []
-    for key in scriptData['keys']:
+    for key in finalDevice['keys']:
         number = allKeys.get(key)
         keyList.append(number)
 
@@ -30,7 +60,7 @@ async def initialize(scriptData: dict):
     # Create the virtual input device with absolute positioning
     ui = UInput(cap, name='taskZen-virtual-input-device', phys='taskZen-virtual-input-device')
 
-    return ui
+    return ui, None
 
 def getAllKeys():
     # Create the allKeys dictionary
@@ -43,7 +73,7 @@ def getAllKeys():
             allKeys[values] = key
     return allKeys
 
-def readScript(scriptPath: str = "examples/exampleKeyboard.yaml"):
+def readScript(scriptPath: str):
     """
     Read the YAML file and return the data
 
