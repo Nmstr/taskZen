@@ -1,15 +1,18 @@
 from evdev import UInput, ecodes as e, AbsInfo
-import asyncio
 import yaml
 import os
 
-async def initialize(scriptData: dict):
+async def initialize(scriptData: dict) -> tuple:
+    finalDevice = getFinalDevice(scriptData)
+    if finalDevice is None:
+        return None, 'Device not found'
+
     # Create the allKeys dictionary
     allKeys = getAllKeys()
         
     # Create the key list
     keyList = []
-    for key in scriptData['keys']:
+    for key in finalDevice['keys']:
         number = allKeys.get(key)
         keyList.append(number)
 
@@ -29,11 +32,41 @@ async def initialize(scriptData: dict):
     }
 
     # Create the virtual input device with absolute positioning
-    ui = UInput(cap, name='taskZen-virtual-input-device', phys='taskZen-virtual-input-device')
+    ui = UInput(cap, name=finalDevice['name'], phys=finalDevice['phys'], version=finalDevice['version'])
 
-    return ui
+    return ui, None
 
-def getAllKeys():
+def getFinalDevice(scriptData: dict) -> dict:
+    # Find all matching devices
+    deviceDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/devices/'
+    foundDevices = []
+    for file in os.listdir(deviceDir):
+        with open(deviceDir + file, 'r') as f:
+            deviceData = yaml.safe_load(f)
+        if scriptData['device'] == deviceData['name']:
+            foundDevices.append(file)
+
+    finalDevice = None
+    # Match the version
+    if scriptData.get('device-version') is None: # Get newest version
+        foundDevicesData = []
+        for device in foundDevices:
+            with open(deviceDir + device, 'r') as f:
+                device = yaml.safe_load(f)
+            foundDevicesData.append(device)
+        finalDevice = max(foundDevicesData, key=lambda x: x['version'])
+
+    else: # Get matching version
+        for device in foundDevices:
+            with open(deviceDir + device, 'r') as f:
+                deviceData = yaml.safe_load(f)
+            if deviceData['version'] == scriptData.get('device-version'):
+                finalDevice = deviceData
+                break
+        
+    return finalDevice
+
+def getAllKeys() -> dict:
     # Create the allKeys dictionary
     allKeys = {}
     for key, values in e.keys.items():
@@ -44,7 +77,7 @@ def getAllKeys():
             allKeys[values] = key
     return allKeys
 
-def readScript(scriptPath: str = "examples/exampleKeyboard.yaml"):
+def readScript(scriptPath: str) -> dict:
     """
     Read the YAML file and return the data
 
@@ -60,7 +93,7 @@ def readScript(scriptPath: str = "examples/exampleKeyboard.yaml"):
     
     return scriptData
 
-def findScript(scriptName: str):
+def findScript(scriptName: str) -> str:
     """
     Finds the file path for any given script
 
@@ -87,7 +120,7 @@ def scriptContainsExec(scriptData: dict) -> bool:
     Returns:
         - bool: Whether the script contains an exec command
     """
-    def containsExec(steps):
+    def containsExec(steps: list) -> bool:
         for step in steps:
             if step['type'] == 'exec':
                 return True

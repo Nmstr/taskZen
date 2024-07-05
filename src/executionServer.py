@@ -1,4 +1,4 @@
-from initialize import initialize, readScript, findScript, getAllKeys
+from initialize import initialize, readScript, findScript, getAllKeys, getFinalDevice
 from executer import Executer
 import datetime
 import asyncio
@@ -12,7 +12,7 @@ runningExecutions = {}
 allDevices = {}
 verbose = False
 
-async def sendMessage(message, requireVerbose=False, *, writer):
+async def sendMessage(message: str, requireVerbose: bool = False, *, writer: asyncio.StreamWriter) -> None:
     """
     Asynchronously sends a message to a writer.
 
@@ -41,7 +41,7 @@ async def sendMessage(message, requireVerbose=False, *, writer):
 
     await writer.drain()
 
-async def processInstruction(scriptName, *, writer, file = False, allowExec = False):
+async def processInstruction(scriptName: str, *, writer: asyncio.StreamWriter, file: bool = False, allowExec: bool = False) -> None:
     """
     Processes an instruction to execute a script.
     Asumes that the script exists. This should have been verified by the client.
@@ -64,14 +64,20 @@ async def processInstruction(scriptName, *, writer, file = False, allowExec = Fa
 
     scriptData = readScript(scriptPath)
     allKeys = getAllKeys()
-    ui = await getDevice(scriptData, writer=writer)
+    ui, error = await getDevice(scriptData, writer=writer)
+
+    if not ui: # Failed to initialize
+        await sendMessage(f'Failed to initialize device.', writer=writer)
+        await sendMessage(f'Error: {error}', writer=writer)
+        return
+    await sendMessage(f'Device initialized.', writer=writer)
 
     executer = Executer(sendMessageFunction=sendMessage, writer=writer, ui=ui, allKeys=allKeys, allowExec=allowExec)
     runningExecutions[scriptName] = {'executer': executer, 'creationTime': datetime.datetime.now()}
     await executer.execute(scriptData)
     runningExecutions.pop(scriptName)
         
-async def getDevice(scriptData, *, writer):
+async def getDevice(scriptData: dict, *, writer: asyncio.StreamWriter) -> tuple:
     """
     Retrieves a device from the `allDevices` dictionary based on the provided `scriptData['name']`.
     If the device is not found, it initializes the device using the `initialize` function and adds it to the `allDevices` dictionary.
@@ -83,14 +89,15 @@ async def getDevice(scriptData, *, writer):
     Returns:
         Any: The device corresponding to the provided `scriptData['name']`.
     """
-    if allDevices.get(scriptData['name']) is None:
+    error = None
+    deviceData = getFinalDevice(scriptData)
+    if allDevices.get(f'{deviceData["name"]}-{deviceData["version"]}') is None:
         await sendMessage(f'Device not found. Initializing...', writer=writer)
-        ui = await initialize(scriptData)
-        allDevices[scriptData['name']] = ui
-        await sendMessage(f'Device initialized.', writer=writer)
-    return allDevices[scriptData['name']]
+        ui, error = await initialize(scriptData)
+        allDevices[f'{deviceData["name"]}-{deviceData["version"]}'] = ui
+    return allDevices[f'{deviceData["name"]}-{deviceData["version"]}'], error
 
-async def handleClient(reader, writer):
+async def handleClient(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
     """
     Asynchronously handles a client connection by reading its instructions and executing them.
     
@@ -149,7 +156,7 @@ async def handleClient(reader, writer):
     await sendMessage(f'end', writer=writer)
     writer.close()
 
-async def main():
+async def main() -> None:
     """
     Asynchronously creates a Unix socket and starts serving it until done.
 

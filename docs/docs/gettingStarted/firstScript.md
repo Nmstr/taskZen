@@ -10,12 +10,10 @@ nav_order: 300
 
 ## Introduction
 
-Scripts are .yaml files used by taskZen to automate tasks. This page will walk you through on how to create your own script from scratch. If you already know the basics and what to create more advanced scripts you can view the script reference [here](https://nmstr.github.io/taskZen/scriptReference).
-This page will be using vim to create them. Though, you can use any text editor you like.
+Scripts are .yaml files used by taskZen to automate tasks. This page will walk you through on how to create your own script from scratch. If you already know the basics and want to create more advanced scripts you can view the script reference [here](https://nmstr.github.io/taskZen/scriptReference).
+To follow this tutorial you will need to have taskZen and a text editor installed.
 
-Scripts are located in "~/.config/taskZen/". Create a .yaml file here and open it.
-
-`vim exampleScript.yaml`
+Scripts are located in "~/.config/taskZen/". Create a .yaml file there and open it.
 
 ## Writing the header
 
@@ -35,16 +33,10 @@ The next thing to set is the `speed`. The speed it the time between instructions
 
 ***
 
-Now follows the most important part of the header. `keys`. Here you define what keys your script will be using. A key is basically just a button. For example `KEY_A` corresponds to the "A" key on your keyboard. A list of all keys can be found [here](https://nmstr.github.io/taskZen/availableKeys). For our script we will be using the A, B and Shift key, as well as the BTN_MOUSE key. This means our key section will look like this:
-```
-keys:
-  - KEY_A
-  - KEY_B
-  - KEY_LEFTSHIFT
-  - BTN_MOUSE
-```
+Now follows another critical part for the header. The `device` section. Here you need to define what device you want to use in your script. Different devices have different capabilites. Later you can even define your own devices, but for now the built-in `taskZen-minimal` device will do the job.
 
-_Note that at least one entry is required, even if it will not be used._
+`device: taskZen-minimal`
+
 ***
 
 Now the last part of the header. The `screen` section. Here goes the width and height of your screens. This is used for absolute mouse positioning. For 1 single 1920x1080 display this section would look like this:
@@ -152,10 +144,7 @@ With that we are done. Our script should now look like this:
 ```
 name: exampleScript
 speed: 100
-keys:
-  - KEY_A
-  - KEY_B
-  - BTN_MOUSE
+device: taskZen-minimal
 screen:
   width: 1920
   height: 1080

@@ -1,6 +1,7 @@
 from initialize import readScript, findScript, scriptContainsExec
 import argparse
 import socket
+import shutil
 import yaml
 import json
 import os
@@ -8,7 +9,7 @@ import os
 HEADER_LENGTH = 10
 SOCKET_PATH = '/tmp/taskZen.sock'
 
-def sendInstruction(instruction, *, verbose=True):
+def sendInstruction(instruction: str, *, verbose: bool = True) -> None:
     """
     A function that sends an instruction over a Unix socket connection and recieves a response.
 
@@ -19,7 +20,7 @@ def sendInstruction(instruction, *, verbose=True):
     Returns:
         None
     """
-    def receiveMessage(sock):
+    def receiveMessage(sock: socket.socket) -> str:
         header = sock.recv(HEADER_LENGTH).decode('utf-8')
         if not header:
             return None
@@ -39,7 +40,20 @@ def sendInstruction(instruction, *, verbose=True):
             if verbose and response:
                 print(response)
 
-def main():
+def checkConfig() -> None:
+    configDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/'
+    os.makedirs(configDir, exist_ok=True)
+    os.makedirs(configDir + 'scripts/', exist_ok=True)
+    os.makedirs(configDir + 'devices/', exist_ok=True)
+    currentPath = f'{os.path.dirname(os.path.realpath(__file__))}'
+    for script in os.listdir(currentPath + '/../examples/scripts'):
+        if not os.path.exists(configDir + 'scripts/' + script):
+            shutil.copyfile(currentPath + '/../examples/scripts/' + script, configDir + 'scripts/' + script)
+    for device in os.listdir(currentPath + '/../examples/devices'):
+        if not os.path.exists(configDir + 'devices/' + device):
+            shutil.copyfile(currentPath + '/../examples/devices/' + device, configDir + 'devices/' + device)
+
+def main() -> None:
     scriptDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/scripts/'
     if not os.path.exists(scriptDir):
         os.makedirs(scriptDir, exist_ok=True)
@@ -194,4 +208,5 @@ def main():
         )
 
 if __name__ == '__main__':
+    checkConfig()
     main()

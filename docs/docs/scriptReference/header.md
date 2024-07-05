@@ -30,22 +30,30 @@ Example:
 - This is required.
 - This may only be an int.
 
-### Keys
+### Device
 
-The keys your script has access to during execution.
+The device that the script will be using.
 
 Example:
 ```
-keys:
-  - KEY_A
-  - KEY_B
-  - KEY_LEFTSHIFT
-  - BTN_MOUSE
+device: taskZen-minimal
 ```
 
 - This is required.
-- This needs to have at least one key.
-- A list of all available keys can be found [here](https://nmstr.github.io/taskZen/availableKeys).
+- The [device](https://nmstr.github.io/taskZen/deviceReference) must exist and be valid.
+
+### Device Version
+
+This is be the version of the device yourr script will be using.
+
+Example:
+```
+device-version: 1
+```
+
+- This is optional.
+- The version has to exist.
+- The version must be an integer.
 
 ### Screen
 
