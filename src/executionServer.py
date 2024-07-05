@@ -1,4 +1,4 @@
-from initialize import initialize, readScript, findScript, getAllKeys
+from initialize import initialize, readScript, findScript, getAllKeys, getFinalDevice
 from executer import Executer
 import datetime
 import asyncio
@@ -90,11 +90,12 @@ async def getDevice(scriptData, *, writer):
         Any: The device corresponding to the provided `scriptData['name']`.
     """
     error = None
-    if allDevices.get(scriptData['name']) is None:
+    deviceData = getFinalDevice(scriptData)
+    if allDevices.get(f'{deviceData["name"]}-{deviceData["version"]}') is None:
         await sendMessage(f'Device not found. Initializing...', writer=writer)
         ui, error = await initialize(scriptData)
-        allDevices[scriptData['name']] = ui
-    return allDevices[scriptData['name']], error
+        allDevices[f'{deviceData["name"]}-{deviceData["version"]}'] = ui
+    return allDevices[f'{deviceData["name"]}-{deviceData["version"]}'], error
 
 async def handleClient(reader, writer):
     """
