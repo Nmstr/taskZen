@@ -57,7 +57,7 @@ async def processInstruction(scriptName: str, *, writer: asyncio.StreamWriter, f
         None
     """
     # Find the script
-    if file == 'True':
+    if file is True:
         scriptPath = scriptName
     else:
         scriptPath = findScript(scriptName)
