@@ -8,7 +8,7 @@ import os
 HEADER_LENGTH = 10
 SOCKET_PATH = '/tmp/taskZen.sock'
 
-def sendInstruction(instruction, *, verbose=True):
+def sendInstruction(instruction: str, *, verbose: bool = True) -> None:
     """
     A function that sends an instruction over a Unix socket connection and recieves a response.
 
@@ -19,7 +19,7 @@ def sendInstruction(instruction, *, verbose=True):
     Returns:
         None
     """
-    def receiveMessage(sock):
+    def receiveMessage(sock: socket.socket) -> str:
         header = sock.recv(HEADER_LENGTH).decode('utf-8')
         if not header:
             return None
@@ -39,7 +39,7 @@ def sendInstruction(instruction, *, verbose=True):
             if verbose and response:
                 print(response)
 
-def main():
+def main() -> None:
     scriptDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/scripts/'
     if not os.path.exists(scriptDir):
         os.makedirs(scriptDir, exist_ok=True)

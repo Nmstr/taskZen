@@ -12,7 +12,7 @@ runningExecutions = {}
 allDevices = {}
 verbose = False
 
-async def sendMessage(message, requireVerbose=False, *, writer):
+async def sendMessage(message: str, requireVerbose: bool = False, *, writer: asyncio.StreamWriter) -> None:
     """
     Asynchronously sends a message to a writer.
 
@@ -41,7 +41,7 @@ async def sendMessage(message, requireVerbose=False, *, writer):
 
     await writer.drain()
 
-async def processInstruction(scriptName, *, writer, file = False, allowExec = False):
+async def processInstruction(scriptName: str, *, writer: asyncio.StreamWriter, file: bool = False, allowExec: bool = False) -> None:
     """
     Processes an instruction to execute a script.
     Asumes that the script exists. This should have been verified by the client.
@@ -77,7 +77,7 @@ async def processInstruction(scriptName, *, writer, file = False, allowExec = Fa
     await executer.execute(scriptData)
     runningExecutions.pop(scriptName)
         
-async def getDevice(scriptData, *, writer):
+async def getDevice(scriptData: dict, *, writer: asyncio.StreamWriter) -> tuple:
     """
     Retrieves a device from the `allDevices` dictionary based on the provided `scriptData['name']`.
     If the device is not found, it initializes the device using the `initialize` function and adds it to the `allDevices` dictionary.
@@ -97,7 +97,7 @@ async def getDevice(scriptData, *, writer):
         allDevices[f'{deviceData["name"]}-{deviceData["version"]}'] = ui
     return allDevices[f'{deviceData["name"]}-{deviceData["version"]}'], error
 
-async def handleClient(reader, writer):
+async def handleClient(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
     """
     Asynchronously handles a client connection by reading its instructions and executing them.
     
@@ -156,7 +156,7 @@ async def handleClient(reader, writer):
     await sendMessage(f'end', writer=writer)
     writer.close()
 
-async def main():
+async def main() -> None:
     """
     Asynchronously creates a Unix socket and starts serving it until done.
 
