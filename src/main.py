@@ -1,6 +1,7 @@
 from initialize import readScript, findScript, scriptContainsExec
 import argparse
 import socket
+import shutil
 import yaml
 import json
 import os
@@ -38,6 +39,19 @@ def sendInstruction(instruction: str, *, verbose: bool = True) -> None:
                 break
             if verbose and response:
                 print(response)
+
+def checkConfig() -> None:
+    configDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/'
+    os.makedirs(configDir, exist_ok=True)
+    os.makedirs(configDir + 'scripts/', exist_ok=True)
+    os.makedirs(configDir + 'devices/', exist_ok=True)
+    currentPath = f'{os.path.dirname(os.path.realpath(__file__))}'
+    for script in os.listdir(currentPath + '/../examples/scripts'):
+        if not os.path.exists(configDir + 'scripts/' + script):
+            shutil.copyfile(currentPath + '/../examples/scripts/' + script, configDir + 'scripts/' + script)
+    for device in os.listdir(currentPath + '/../examples/devices'):
+        if not os.path.exists(configDir + 'devices/' + device):
+            shutil.copyfile(currentPath + '/../examples/devices/' + device, configDir + 'devices/' + device)
 
 def main() -> None:
     scriptDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/scripts/'
@@ -194,4 +208,5 @@ def main() -> None:
         )
 
 if __name__ == '__main__':
+    checkConfig()
     main()
