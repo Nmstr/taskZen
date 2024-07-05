@@ -1,5 +1,4 @@
 from evdev import UInput, ecodes as e, AbsInfo
-import asyncio
 import yaml
 import os
 
