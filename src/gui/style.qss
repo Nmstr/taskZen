@@ -1,3 +1,7 @@
+#HomeWindow {
+    background-color: #1b1e20;
+}
+
 QPushButton {
     background-color: #31363b;
     color: white;
@@ -28,36 +32,22 @@ QTextBrowser {
 
 EntryWidget {
     background-color: #2c3035;
-    border: 1px solid #202327;
-    border-radius: 10px
 }
 
-#HomeWindow {
-    background-color: #1b1e20;
-}
-
-QFrame#scriptSide {
-    background-color: #24282c;
-    border: 1px solid #202327;
-    border-radius: 10px;
-}
-
-QFrame#deviceSide {
-    background-color: #24282c;
-    border: 1px solid #202327;
-    border-radius: 10px;
-}
-
+EntryWidget,
+QFrame#scriptSide,
+QFrame#deviceSide,
 QFrame#topBar {
-    background-color: #24282c;
     border: 1px solid #202327;
     border-radius: 10px;
 }
 
-QWidget#scriptSideContent {
-    background-color: #24282c;
-}
-
-QWidget#deviceSideContent {
+QFrame#scriptSide,
+QFrame#deviceSide,
+QFrame#topBar,
+QWidget#scriptSideContent,
+QWidget#deviceSideContent,
+QScrollArea#scriptScrollArea,
+QScrollArea#deviceScrollArea {
     background-color: #24282c;
 }
