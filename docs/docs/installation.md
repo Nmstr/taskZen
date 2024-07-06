@@ -46,17 +46,27 @@ On some systems `pyevdev` does not install properly out of the box.
 
 You will need to have `linux/input.h`, `linux/input-event-codes.h`, which are part of the Linux Kernel Headers, and `gcc` installed on your system.
 
-For Debian-based distros, use the following command:
-```apt-get install gcc linux-headers-$(uname -r)```
+Depending on your distro, you will need to run one of the following commands:
 
-For Arch-based distros, use the following command:
-```pacman -S gcc linux-headers```
+For Debian-based distros:
+```
+apt-get install gcc linux-headers-$(uname -r)
+```
 
-For RHEL-based distros, use the following command:
-```dnf install gcc kernel-headers-$(uname -r)```
+For Arch-based distros:
+```
+pacman -S gcc linux-headers
+```
 
-For Gentoo Linux, use the following command:
-```emerge sys-devel/gcc sys-kernel/linux-headers```
+For RHEL-based distros:
+```
+dnf install gcc kernel-headers-$(uname -r)
+```
+
+For Gentoo Linux:
+```
+emerge sys-devel/gcc sys-kernel/linux-headers
+```
 
 ### /dev/uinput cannot be opened for writing
 
