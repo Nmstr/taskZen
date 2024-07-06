@@ -16,7 +16,7 @@
   <property name="frameShape">
    <enum>QFrame::Shape::NoFrame</enum>
   </property>
-  <widget class="QLabel" name="scriptNameLabel">
+  <widget class="QLabel" name="entryNameLabel">
    <property name="geometry">
     <rect>
      <x>140</x>

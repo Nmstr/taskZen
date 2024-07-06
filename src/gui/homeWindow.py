@@ -2,8 +2,9 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 
-from homeDisplay.scriptEntry import ScriptEntryWidget
+from homeDisplay.entryWidget import EntryWidget
 from scriptWindow import ScriptWindow
+from deviceWindow import DeviceWindow
 
 import yaml
 import os
@@ -27,21 +28,24 @@ class HomeWindow(QMainWindow):
         self.setGeometry(self.ui.geometry())
 
         # Connect buttons
-        self.ui.createScriptBtn.clicked.connect(self.createScript)
+        self.ui.createScriptBtn.clicked.connect(lambda: ScriptWindow(self))
+        self.ui.createDeviceBtn.clicked.connect(lambda: DeviceWindow(self))
 
-        self.loadScripts()
+        self.loadEntries('scripts', '~/.config/taskZen/scripts')
+        self.loadEntries('devices', '~/.config/taskZen/devices')
 
-    def loadScripts(self) -> None:
-        for filename in os.listdir(os.path.expanduser("~/.config/taskZen/scripts")):
+    def loadEntries(self, target, directory) -> None:
+        for filename in os.listdir(os.path.expanduser(directory)):
             if filename.endswith(".yaml"):
-                filepath = os.path.expanduser(f"~/.config/taskZen/scripts/{filename}")
+                filepath = os.path.expanduser(f"{directory}/{filename}")
                 scriptData = yaml.safe_load(open(filepath))
-                scriptEntry = ScriptEntryWidget(self, scriptData, filepath)
-                self.ui.scriptSideContent.layout().addWidget(scriptEntry)
-                self.ui.scriptSideContent.setMinimumHeight(self.ui.scriptSideContent.height() + 75)
-
-    def createScript(self) -> None:
-        scriptWindow = ScriptWindow(self)
+                scriptEntry = EntryWidget(self, target, scriptData['name'], filepath)
+                if target == 'scripts':
+                    self.ui.scriptSideContent.layout().addWidget(scriptEntry)
+                    self.ui.scriptSideContent.setMinimumHeight(self.ui.scriptSideContent.height() + 75)
+                elif target == 'devices':
+                    self.ui.deviceSideContent.layout().addWidget(scriptEntry)
+                    self.ui.deviceSideContent.setMinimumHeight(self.ui.deviceSideContent.height() + 75)
 
 if __name__ == "__main__":
     app = QApplication([])
