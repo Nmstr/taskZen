@@ -16,19 +16,15 @@
   <property name="frameShape">
    <enum>QFrame::Shape::NoFrame</enum>
   </property>
-  <widget class="QLabel" name="entryNameLabel">
-   <property name="geometry">
-    <rect>
-     <x>140</x>
-     <y>20</y>
-     <width>231</width>
-     <height>18</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>ScriptName</string>
-   </property>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="entryNameLabel">
+     <property name="text">
+      <string>ScriptName</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

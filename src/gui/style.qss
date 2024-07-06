@@ -26,8 +26,38 @@ QTextBrowser {
     background-color: transparent;
 }
 
-#EntryWidget {
+EntryWidget {
     background-color: #2c3035;
     border: 1px solid #202327;
     border-radius: 10px
+}
+
+#HomeWindow {
+    background-color: #1b1e20;
+}
+
+QFrame#scriptSide {
+    background-color: #24282c;
+    border: 1px solid #202327;
+    border-radius: 10px;
+}
+
+QFrame#deviceSide {
+    background-color: #24282c;
+    border: 1px solid #202327;
+    border-radius: 10px;
+}
+
+QFrame#topBar {
+    background-color: #24282c;
+    border: 1px solid #202327;
+    border-radius: 10px;
+}
+
+QWidget#scriptSideContent {
+    background-color: #24282c;
+}
+
+QWidget#deviceSideContent {
+    background-color: #24282c;
 }
