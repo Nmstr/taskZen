@@ -46,9 +46,21 @@ _If you have problems installing pyevdev take a look at troubleshooting section 
 
 ### Pyevdev installation
 
-One package required is pyevdev. On some systems it does not install properly out of the box. For example Fedora 40 is one of those.
+On some systems `pyevdev` does not install properly out of the box.
 
-You will need `linux/input.h` and `linux/input-event-codes.h`, which are part of the Linux Kernel Headers, as well as gcc installed on your system.
+You will need to have `linux/input.h`, `linux/input-event-codes.h`, which are part of the Linux Kernel Headers, and `gcc` installed on your system.
+
+For Debian-based distros, use the following command:
+```apt-get install gcc linux-headers-$(uname -r)```
+
+For Arch-based distros, use the following command:
+```pacman -S gcc linux-headers```
+
+For RHEL-based distros, use the following command:
+```dnf install gcc kernel-headers-$(uname -r)```
+
+For Gentoo Linux, use the following command:
+```emerge sys-devel/gcc sys-kernel/linux-headers```
 
 Depending on your distro, you will need to use one of these commands:
 ```
@@ -60,9 +72,7 @@ pacman -S gcc linux-headers
 
 ### /dev/uinput cannot be opened for writing
 
-`/dev/uinput cannot be opened for writing` is a permission issue. Unfortunately running taskZen as root results in unwanted side-effects and thus isnt advised.
-
-An easy solution for this problem is to give yourself the necessary permissions. This can be done using this command:
+`/dev/uinput cannot be opened for writing` is a permission issue. To solve this, you will need to give yourself the necessary permissions. This can be done using the following command:
 ```
 sudo chmod a+rw /dev/uinput
 ```
