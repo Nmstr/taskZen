@@ -58,14 +58,6 @@ For RHEL-based distros, use the following command:
 For Gentoo Linux, use the following command:
 ```emerge sys-devel/gcc sys-kernel/linux-headers```
 
-Depending on your distro, you will need to use one of these commands:
-```
-dnf install gcc kernel-headers-$(uname -r)
-apt-get install gcc linux-headers-$(uname -r)
-emerge sys-devel/gcc sys-kernel/linux-headers
-pacman -S gcc linux-headers
-```
-
 ### /dev/uinput cannot be opened for writing
 
 `/dev/uinput cannot be opened for writing` is a permission issue. To solve this, you will need to give yourself the necessary permissions. This can be done using the following command:
