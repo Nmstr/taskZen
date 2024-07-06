@@ -50,7 +50,7 @@
          </size>
         </property>
         <property name="frameShape">
-         <enum>QFrame::Shape::StyledPanel</enum>
+         <enum>QFrame::Shape::NoFrame</enum>
         </property>
         <property name="frameShadow">
          <enum>QFrame::Shadow::Raised</enum>
@@ -73,7 +73,22 @@
     </widget>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="deviceInput"/>
+    <widget class="QFrame" name="deviceInputFrame">
+     <property name="frameShape">
+      <enum>QFrame::Shape::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="rightMargin">
+       <number>5</number>
+      </property>
+      <item>
+       <widget class="QPlainTextEdit" name="deviceInput"/>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>
