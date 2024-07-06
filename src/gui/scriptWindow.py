@@ -39,6 +39,7 @@ class ScriptRunner(QObject):
 class ScriptWindow(QMainWindow):
     def __init__(self, parent: QWidget = None, filepath: str = None) -> None:
         super().__init__(parent)
+        self.setObjectName("ScriptWindow")
         self.setWindowTitle("taskZen - Script")
         self.filepath = filepath
         self.running = False

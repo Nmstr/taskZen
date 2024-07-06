@@ -7,6 +7,7 @@ import os
 class DeviceWindow(QMainWindow):
     def __init__(self, parent: QWidget = None, filepath: str = None) -> None:
         super().__init__(parent)
+        self.setObjectName("DeviceWindow")
         self.setWindowTitle("taskZen - Device")
         self.filepath = filepath
 

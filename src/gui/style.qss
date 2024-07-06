@@ -1,4 +1,6 @@
-#HomeWindow {
+#HomeWindow,
+#ScriptWindow,
+#DeviceWindow {
     background-color: #1b1e20;
 }
 
@@ -41,7 +43,7 @@ EntryWidget:hover {
 
 QFrame#scriptInputFrame,
 QFrame#deviceInputFrame {
-    background-color: #1a1d1f;
+    background-color: #202429;
 }
 
 QFrame#deviceInputFrame,
@@ -55,6 +57,7 @@ QFrame#topBar {
     border-radius: 10px;
 }
 
+QFrame#side,
 QFrame#scriptSide,
 QFrame#deviceSide,
 QFrame#topBar,
