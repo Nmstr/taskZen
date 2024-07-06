@@ -41,6 +41,7 @@ class ScriptWindow(QMainWindow):
         super().__init__(parent)
         self.setWindowTitle("taskZen - Script")
         self.filepath = filepath
+        self.running = False
 
         # Load the UI file
         loader = QUiLoader()
@@ -82,6 +83,15 @@ class ScriptWindow(QMainWindow):
         self.ui.sideText.setText(self.outputText)
 
     def runScript(self) -> None:
+        if self.running:
+            self.updateSideText('Stopping script...\n')
+            self.ui.sideText.setText(self.outputText)
+            subprocess.run(['taskZen', 'execute', '-kf', self.filepath], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            self.updateSideText('Script stopped\n')
+            self.ui.sideText.setText(self.outputText)
+            self.setRunning(False)
+            return
+        self.setRunning(True)
         self.outputText = 'Running script...\n'
         self.ui.sideText.setText(self.outputText)
 
@@ -99,8 +109,18 @@ class ScriptWindow(QMainWindow):
         self.thread.started.connect(self.scriptRunner.run)
         self.thread.start()
 
-        self.ui.runBtn.setDisabled(True)
-        self.scriptRunner.finished.connect(lambda: self.ui.runBtn.setDisabled(False))
+        self.scriptRunner.finished.connect(lambda: self.setRunning(False))
+
+    def setRunning(self, value):
+        self.running = value
+        if self.running:
+            self.ui.runBtn.setStyleSheet("""
+                                        background-color: #202327;
+                                        border: 1px solid #810000;
+                                    """)
+        else:
+            self.ui.runBtn.setStyleSheet("")
+                                        
 
     def updateSideText(self, text):
         self.outputText += text
