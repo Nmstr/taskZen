@@ -38,10 +38,6 @@ _If you have problems installing pyevdev take a look at troubleshooting section 
 
 `taskZen`
 
-6. (Optional) Clone the example scripts into the scripts directory
-
-`cp -r ../examples/* ~/.config/taskZen/`
-
 ## Troubleshooting
 
 ### Pyevdev installation
