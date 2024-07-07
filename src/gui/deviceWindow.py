@@ -37,9 +37,14 @@ class DeviceWindow(QMainWindow):
         scriptData = self.ui.deviceInput.toPlainText()
 
         if self.filepath is None:
+            if 'FLATPAK_ID' in os.environ:
+                defaultPath = os.path.expanduser('/home/user/.var/app/io.github.nmstr.taskZen/config/taskZen/devices/')
+            else:
+                defaultPath = os.path.expanduser('~/.config/taskZen/devices/')
+
             options = QFileDialog.Options()
             options |= QFileDialog.DontUseNativeDialog
-            self.filepath, _ = QFileDialog.getSaveFileName(self, "Save Device", os.path.expanduser("~/.config/taskZen/devices"), "Yaml Files (*.yaml)", options=options)
+            self.filepath, _ = QFileDialog.getSaveFileName(self, 'Save Device', defaultPath, 'Yaml Files (*.yaml)', options=options)
             if self.filepath == '':
                 return
 
