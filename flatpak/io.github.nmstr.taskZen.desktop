@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Exec=gui.sh
+Terminal=false
+Name=taskZen
+Comment= Automation utility for Wayland
+Categories=System;

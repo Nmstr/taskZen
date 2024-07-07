@@ -44,13 +44,15 @@ modules:
       - type: dir
         path: ../
 
-  - name: run.sh
+  - name: desktop
     buildsystem: simple
     sources:
       - type: dir
         path: .
     build-commands:
+      - desktop-file-install --dir=/app/share/applications/ io.github.nmstr.taskZen.desktop
       - cp run.sh /app/bin
+      - cp gui.sh /app/bin
 
 finish-args:
   - --socket=wayland
