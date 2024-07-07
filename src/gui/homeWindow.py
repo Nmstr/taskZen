@@ -52,8 +52,9 @@ class HomeWindow(QMainWindow):
                 widget.setParent(None)
             self.ui.deviceSideContent.setFixedHeight(self.ui.deviceSideContent.height() - 75)
 
-        self.loadEntries('scripts', '~/.config/taskZen/scripts')
-        self.loadEntries('devices', '~/.config/taskZen/devices')
+        configDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config'))
+        self.loadEntries('scripts', f'{configDir}/taskZen/scripts')
+        self.loadEntries('devices', f'{configDir}/taskZen/devices')
 
     def loadEntries(self, target, directory) -> None:
         for filename in os.listdir(os.path.expanduser(directory)):

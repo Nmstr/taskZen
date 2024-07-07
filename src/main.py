@@ -75,8 +75,8 @@ def main() -> None:
     parserServer.add_argument('-s', '--start', action='store_true', help='start the execution server')
     parserServer.add_argument('-k', '--kill', action='store_true', help='kill the execution server')
 
-    parserGui = subparsers.add_parser('gui', help='Start the taskZen GUI')
-    
+    parser.add_argument('--command', default='default_command')
+
     args = parser.parse_args()
 
     if args.command is None:
@@ -156,7 +156,7 @@ def main() -> None:
         for file in os.listdir(scriptDir):
             with open(scriptDir + file, 'r') as f:
                 scriptData = yaml.safe_load(f)
-            print(f'\t- {scriptData['name']} ({os.path.abspath(scriptDir + file)})')
+            print(f'\t- {scriptData["name"]} ({os.path.abspath(scriptDir + file)})')
 
     elif args.command in ['server']:
         if args.start:
@@ -170,10 +170,13 @@ def main() -> None:
             except (ConnectionRefusedError, FileNotFoundError):
                 from subprocess import DEVNULL
                 import subprocess
-                scriptPath = f'{os.path.dirname(os.path.realpath(__file__))}/executionServer.py'
-                # Start the subprocess in a new session and redirect standard streams to DEVNULL
+                currentPath = f'{os.path.dirname(os.path.realpath(__file__))}'
+                if 'FLATPAK_ID' in os.environ:
+                    pythonExecutable = "/usr/bin/python"
+                else:
+                    pythonExecutable = os.path.join(os.getenv('VIRTUAL_ENV', ''), 'bin/python')
                 subprocess.Popen(
-                    [f"{os.path.join(os.getenv('VIRTUAL_ENV', ''), 'bin/python')}", scriptPath],
+                    [pythonExecutable, f'{currentPath}/executionServer.py'],
                     start_new_session=True,
                     stdout=DEVNULL,
                     stderr=DEVNULL,
@@ -197,14 +200,17 @@ def main() -> None:
         from subprocess import DEVNULL
         import subprocess
         currentPath = f'{os.path.dirname(os.path.realpath(__file__))}'
-        # Start the subprocess in a new session and redirect standard streams to DEVNULL
+        if 'FLATPAK_ID' in os.environ:
+            pythonExecutable = "/usr/bin/python"
+        else:
+            pythonExecutable = os.path.join(os.getenv('VIRTUAL_ENV', ''), 'bin/python')
         subprocess.Popen(
-            [f"{os.path.join(os.getenv('VIRTUAL_ENV', ''), 'bin/python')}", f'{currentPath}/gui/homeWindow.py'],
+            [pythonExecutable, f'{currentPath}/gui/homeWindow.py'],
             start_new_session=True,
             stdout=DEVNULL,
             stderr=DEVNULL,
             stdin=DEVNULL,
-            cwd=os.path.dirname(currentPath) # Change the working dir to the dir of the script
+            cwd=os.path.dirname(currentPath),
         )
 
 if __name__ == '__main__':

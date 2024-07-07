@@ -1,0 +1,60 @@
+app-id: io.github.nmstr.taskZen
+runtime: org.kde.Platform
+runtime-version: 6.7
+sdk: org.kde.Sdk
+command: run.sh
+
+modules:
+  - name: dependencies
+    buildsystem: simple
+    builddir: true
+    build-commands:
+      - python3 -m pip install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} PyYAML-*.whl
+      - python3 -m pip install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} PySide6-*.whl
+      - python3 -m pip install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} evdev_binary-*.whl
+    sources:
+      - type: dir
+        path: ../
+      - type: file # PyYAML
+        url: "https://files.pythonhosted.org/packages/7b/5e/efd033ab7199a0b2044dab3b9f7a4f6670e6a52c089de572e928d2873b06/PyYAML-6.0.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+        sha256: "d2b04aac4d386b172d5b9692e2d2da8de7bfb6c387fa4f801fbf6fb2e6ba4673"
+      - type: file # PySide6
+        url : "https://files.pythonhosted.org/packages/34/a6/278c7ed2f76ccfa471c49eb66538243dc0d892fe481b9b6a8bbad8846ba0/PySide6-6.7.2-cp39-abi3-manylinux_2_28_x86_64.whl"
+        sha256: "15e7696a09072ee977f6e6179ab1e48184953df8417bcaa83cfadf0b79747242"
+      - type: file # shiboken6
+        url: "https://files.pythonhosted.org/packages/57/ba/3e38bb62b285d73e46a86f44e7765cea5c42a79b0bba867dfabbdd12b54d/shiboken6-6.7.2-cp39-abi3-manylinux_2_28_x86_64.whl"
+        sha256: "70e80737b27cd5d83504b373013b55e70462bd4a27217d919ff9a83958731990"
+      - type: file # PySide6_Essentials
+        url: "https://files.pythonhosted.org/packages/75/be/527e41a7744142d931e46685dd9c2bdfff39432962abf8a5263be319c2cb/PySide6_Essentials-6.7.2-cp39-abi3-manylinux_2_28_x86_64.whl"
+        sha256: "a1a4c09f1e916b9cfe53151fe4a503a6acb1f6621ba28204d1bfe636f80d6780"
+      - type: file # PySide6_Addons
+        url: "https://files.pythonhosted.org/packages/7f/f2/2128d3876f0c45fcb73000b272be64e1f3b1189f77d79820d7a706051e55/PySide6_Addons-6.7.2-cp39-abi3-manylinux_2_28_x86_64.whl"
+        sha256: "94b9bf6a2a4a7ac671e1776633e50d51326c86f4184f1c6e556f4dd5498fd52a"
+      - type: file # evdev
+        url: "https://files.pythonhosted.org/packages/69/8a/feb1080d290e727cf968f402f4fa36753d308ebee9a08219c03205ad5ad0/evdev_binary-1.7.1-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_28_x86_64.whl"
+        sha256: "e5d0ccf19403f4884948915fc4922dce4660778ea37ea627b2154107eae0820e"
+
+  - name: taskZen
+    buildsystem: simple
+    builddir: true
+    build-commands:
+      - rm -rf .venv
+      - cp -r . /app/bin
+    sources:
+      - type: dir
+        path: ../
+
+  - name: run.sh
+    buildsystem: simple
+    sources:
+      - type: dir
+        path: .
+    build-commands:
+      - cp run.sh /app/bin
+
+finish-args:
+  - --socket=wayland
+  - --socket=x11
+  - --socket=fallback-x11
+  - --filesystem=xdg-config
+  - --device=all

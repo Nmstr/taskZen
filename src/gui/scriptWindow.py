@@ -18,8 +18,14 @@ class ScriptRunner(QObject):
     def run(self):
         try:
             master_fd, slave_fd = pty.openpty()
-            process = subprocess.Popen(['taskZen', 'execute', '-fvy', self.filepath],
-                                    stdout=slave_fd, stderr=subprocess.STDOUT, stdin=slave_fd, close_fds=True)
+            currentPath = f'{os.path.dirname(os.path.realpath(__file__))}'
+            if 'FLATPAK_ID' in os.environ:
+                pythonExecutable = "/usr/bin/python"
+            else:
+                pythonExecutable = os.path.join(os.getenv('VIRTUAL_ENV', ''), 'bin/python')
+
+            process = subprocess.Popen([pythonExecutable, f'{currentPath}/../main.py', 'execute', '-fvy', self.filepath],
+                                       stdout=slave_fd, stderr=subprocess.STDOUT, stdin=slave_fd, close_fds=True)
             os.close(slave_fd)
 
             while True:
@@ -71,9 +77,14 @@ class ScriptWindow(QMainWindow):
         scriptData = self.ui.scriptInput.toPlainText()
 
         if self.filepath is None:
+            if 'FLATPAK_ID' in os.environ:
+                defaultPath = os.path.expanduser('/home/user/.var/app/io.github.nmstr.taskZen/config/taskZen/scripts/')
+            else:
+                defaultPath = os.path.expanduser('~/.config/taskZen/scripts/')
+
             options = QFileDialog.Options()
             options |= QFileDialog.DontUseNativeDialog
-            self.filepath, _ = QFileDialog.getSaveFileName(self, "Save Script", os.path.expanduser("~/.config/taskZen/scripts"), "Yaml Files (*.yaml)", options=options)
+            self.filepath, _ = QFileDialog.getSaveFileName(self, "Save Script", defaultPath, "Yaml Files (*.yaml)", options=options)
             if self.filepath == '':
                 return
 
