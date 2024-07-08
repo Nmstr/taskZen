@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>io.github.nmstr.taskZen</id>
+  
+    <name>taskZen</name>
+    <summary>Automation utility for Wayland</summary>
+
+    <developer id="io.github.nmstr">
+        <name>Namester</name>
+    </developer>
+
+    <metadata_license>MIT</metadata_license>
+    <project_license>GPL-3.0-only</project_license>
+  
+    <description>
+        <p>taskZen is a free and open source automation software for Wayland!</p>
+        <p>Features:</p>
+        <ul>
+            <li>Automate tasks by creating scripts</li>
+            <li>Include mouse movements, button presses, commands and much more in your scripts</li>
+            <li>Simple GUI interface to create and edit scripts</li>
+            <li>Full Wayland compatability out of the box</li>
+            <li>Fully Free and Open Source</li>
+        </ul>
+    </description>
+
+    <url type="homepage">https://nmstr.github.io/taskZen/</url>
+    <url type="bugtracker">https://github.com/Nmstr/taskZen/issues</url>
+    <url type="vcs-browser">https://github.com/Nmstr/taskZen</url>
+
+    <launchable type="desktop-id">io.github.nmstr.taskZen.desktop</launchable>
+    <screenshots>
+    <screenshot type="default">
+        <image>https://github.com/Nmstr/taskZen/assets/82836392/ae80a702-c059-4032-af69-28d68974dc23</image>
+    </screenshot>
+    <screenshot>
+        <image>https://github.com/Nmstr/taskZen/assets/82836392/fdc582b7-0d95-482a-af0f-712a8dad541a</image>
+    </screenshot>
+    </screenshots>
+
+    <content_rating type="oars-1.1" />
+
+    <releases>
+        <release version="1.0" date="2024-07-07">
+            <description translatable="no">
+                <p>This is the first release of taskZen.</p>
+            </description>
+        </release>
+    </releases>
+</component>

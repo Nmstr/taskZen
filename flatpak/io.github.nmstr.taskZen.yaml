@@ -12,6 +12,7 @@ modules:
       - python3 -m pip install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} PyYAML-*.whl
       - python3 -m pip install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} PySide6-*.whl
       - python3 -m pip install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} evdev_binary-*.whl
+      - echo done
     sources:
       - type: dir
         path: ../
@@ -44,19 +45,20 @@ modules:
       - type: dir
         path: ../
 
-  - name: desktop
+  - name: misc
     buildsystem: simple
     sources:
       - type: dir
         path: .
     build-commands:
-      - desktop-file-install --dir=/app/share/applications/ io.github.nmstr.taskZen.desktop
+      - install -D io.github.nmstr.taskZen.desktop /app/share/applications/io.github.nmstr.taskZen.desktop
+      - install -D icon.png /app/share/icons/hicolor/512x512/apps/io.github.nmstr.taskZen.png
+      - install -D io.github.nmstr.taskZen.metainfo.xml /app/share/metainfo/io.github.nmstr.taskZen.metainfo.xml
       - cp run.sh /app/bin
       - cp gui.sh /app/bin
-
+  
 finish-args:
   - --socket=wayland
-  - --socket=x11
   - --socket=fallback-x11
-  - --filesystem=xdg-config
+  - --share=ipc
   - --device=all

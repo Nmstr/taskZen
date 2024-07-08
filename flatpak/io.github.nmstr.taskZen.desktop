@@ -5,3 +5,4 @@ Terminal=false
 Name=taskZen
 Comment= Automation utility for Wayland
 Categories=System;
+Icon=io.github.nmstr.taskZen.png
