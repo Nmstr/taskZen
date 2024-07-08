@@ -75,7 +75,7 @@ def main() -> None:
     parserServer.add_argument('-s', '--start', action='store_true', help='start the execution server')
     parserServer.add_argument('-k', '--kill', action='store_true', help='kill the execution server')
 
-    parser.add_argument('--command', default='default_command')
+    parserGui = subparsers.add_parser('gui', help='Start the taskZen GUI')
 
     args = parser.parse_args()
 

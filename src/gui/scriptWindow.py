@@ -82,9 +82,7 @@ class ScriptWindow(QMainWindow):
             else:
                 defaultPath = os.path.expanduser('~/.config/taskZen/scripts/')
 
-            options = QFileDialog.Options()
-            options |= QFileDialog.DontUseNativeDialog
-            self.filepath, _ = QFileDialog.getSaveFileName(self, "Save Script", defaultPath, "Yaml Files (*.yaml)", options=options)
+            self.filepath, _ = QFileDialog.getSaveFileName(self, "Save Script", defaultPath, "Yaml Files (*.yaml)")
             if self.filepath == '':
                 return
 

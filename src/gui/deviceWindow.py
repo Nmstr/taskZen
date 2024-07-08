@@ -42,9 +42,7 @@ class DeviceWindow(QMainWindow):
             else:
                 defaultPath = os.path.expanduser('~/.config/taskZen/devices/')
 
-            options = QFileDialog.Options()
-            options |= QFileDialog.DontUseNativeDialog
-            self.filepath, _ = QFileDialog.getSaveFileName(self, 'Save Device', defaultPath, 'Yaml Files (*.yaml)', options=options)
+            self.filepath, _ = QFileDialog.getSaveFileName(self, 'Save Device', defaultPath, 'Yaml Files (*.yaml)')
             if self.filepath == '':
                 return
 
