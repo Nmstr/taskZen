@@ -12,7 +12,6 @@ modules:
       - python3 -m pip install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} PyYAML-*.whl
       - python3 -m pip install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} PySide6-*.whl
       - python3 -m pip install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} evdev_binary-*.whl
-      - echo done
     sources:
       - type: dir
         path: ../
