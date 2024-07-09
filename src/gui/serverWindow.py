@@ -36,4 +36,3 @@ class ServerWindow(QMainWindow):
 
     def stopServer(self):
         print(stopServer())
-        
