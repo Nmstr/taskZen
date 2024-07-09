@@ -5,6 +5,7 @@ from PySide6.QtCore import QFile
 from homeDisplay.entryWidget import EntryWidget
 from scriptWindow import ScriptWindow
 from deviceWindow import DeviceWindow
+from serverWindow import ServerWindow
 
 import yaml
 import os
@@ -31,6 +32,7 @@ class HomeWindow(QMainWindow):
         # Connect buttons
         self.ui.createScriptBtn.clicked.connect(lambda: ScriptWindow(self))
         self.ui.createDeviceBtn.clicked.connect(lambda: DeviceWindow(self))
+        self.ui.manageServerBtn.clicked.connect(lambda: ServerWindow(self))
         self.ui.refreshBtn.clicked.connect(self.refreshEntries)
 
         self.refreshEntries()

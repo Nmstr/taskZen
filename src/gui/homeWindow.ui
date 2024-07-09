@@ -181,6 +181,16 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="manageServerBtn">
+        <property name="text">
+         <string>Manage Server</string>
+        </property>
+        <property name="icon">
+         <iconset theme="network-server"/>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="refreshBtn">
         <property name="text">
          <string>Refresh</string>
