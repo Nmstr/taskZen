@@ -7,7 +7,8 @@ import yaml
 import json
 import os
 
-def checkConfig() -> None:
+def checkDirs() -> None:
+    # Handle config
     configDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/'
     os.makedirs(configDir, exist_ok=True)
     os.makedirs(configDir + 'scripts/', exist_ok=True)
@@ -19,6 +20,9 @@ def checkConfig() -> None:
     for device in os.listdir(currentPath + '/../examples/devices'):
         if not os.path.exists(configDir + 'devices/' + device):
             shutil.copyfile(currentPath + '/../examples/devices/' + device, configDir + 'devices/' + device)
+    # Handle cache 
+    cacheDir = os.getenv('XDG_CACHE_HOME', default=os.path.expanduser('~/.cache')) + '/taskZen/'
+    os.makedirs(cacheDir, exist_ok=True)
 
 def main() -> None:
     scriptDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/scripts/'
@@ -155,5 +159,5 @@ def main() -> None:
         )
 
 if __name__ == '__main__':
-    checkConfig()
+    checkDirs()
     main()

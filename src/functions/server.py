@@ -24,13 +24,15 @@ def startServer() -> tuple[bool, str]:
             pythonExecutable = "/usr/bin/python"
         else:
             pythonExecutable = os.path.join(os.getenv('VIRTUAL_ENV', ''), 'bin/python')
-        subprocess.Popen(
-            [pythonExecutable, f'{currentPath}/executionServer.py'],
-            start_new_session=True,
-            stdout=DEVNULL,
-            stderr=DEVNULL,
-            stdin=DEVNULL
-        )
+        logFile = os.getenv('XDG_CACHE_HOME', default=os.path.expanduser('~/.cache')) + '/taskZen/server.log'
+        with open(logFile, 'w') as f:
+            subprocess.Popen(
+                [pythonExecutable, '-u', f'{currentPath}/executionServer.py'],
+                start_new_session=True,
+                stdout=f,
+                stderr=DEVNULL,
+                stdin=DEVNULL
+            )
         return True, 'Server started'
 
 def stopServer() -> tuple[bool, str]:
