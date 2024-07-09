@@ -2,6 +2,13 @@ from PySide6.QtWidgets import QMainWindow, QWidget
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 
+import sys
+from pathlib import Path
+current_dir = Path(__file__).parent
+project_root = current_dir.parent
+sys.path.append(str(project_root))
+from functions.server import startServer, stopServer
+
 class ServerWindow(QMainWindow):
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
@@ -18,4 +25,15 @@ class ServerWindow(QMainWindow):
         # Set the UI geometry
         self.setGeometry(self.ui.geometry())
 
+        # Connect buttons
+        self.ui.runBtn.clicked.connect(self.runServer)
+        self.ui.stopBtn.clicked.connect(self.stopServer)
+
         self.show()
+
+    def runServer(self):
+        print(startServer())
+
+    def stopServer(self):
+        print(stopServer())
+        
