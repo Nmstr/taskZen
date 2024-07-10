@@ -50,11 +50,11 @@ class ServerWindow(QMainWindow):
             self.removeServerOffline()
 
     def runServer(self):
-        print(startServer())
+        startServer()
         self.removeServerOffline()
 
     def stopServer(self):
-        print(stopServer())
+        stopServer()
         self.showServerOffline()
 
     def updateOutput(self) -> None:
@@ -85,8 +85,6 @@ class ServerWindow(QMainWindow):
 
         # Calculate the position of the popover
         outputPos = self.ui.serverOutput.mapToGlobal(self.ui.serverOutput.pos())
-        print(self.ui.serverOutput.pos())
-        print(outputPos)
         popoverPosX = outputPos.x() - (500 / 2) + (self.ui.serverOutput.width() / 2)
         popoverPosY = outputPos.y() - (300 / 2) + (self.ui.serverOutput.height() / 2)
         
