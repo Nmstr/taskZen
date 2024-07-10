@@ -1,19 +1,12 @@
-from PySide6.QtWidgets import QFrame, QWidget
+from PySide6.QtWidgets import QFrame, QWidget, QVBoxLayout
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 
-"""class MainWindow(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.iconWidget = IconWidget('your-icon-name')
-        self.layout = QVBoxLayout(self)
-        self.layout.addWidget(self.iconWidget)
-        self.resize(200, 200)  # Adjust size as needed"""
+from customWidgets.iconDisplay import iconDisplay
 
 class ServerOffline(QFrame):
     def __init__(self, parent: QWidget = None) -> None:
         super().__init__(parent)
-        self.setObjectName("ServerWindow")
 
         # Load the UI file
         loader = QUiLoader()
@@ -24,5 +17,8 @@ class ServerOffline(QFrame):
 
         # Set the UI geometry
         self.setGeometry(self.ui.geometry())
+
+        self.iconWidget = iconDisplay(iconName = 'network-offline', iconSize = 512)
+        self.ui.iconContainer.layout().addWidget(self.iconWidget)
 
         self.show()

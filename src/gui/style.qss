@@ -51,7 +51,8 @@ QFrame#side,
 EntryWidget,
 QFrame#scriptSide,
 QFrame#deviceSide,
-QFrame#topBar {
+QFrame#topBar,
+QFrame#serverOfflineBase {
     border: 1px solid #202327;
     border-radius: 10px;
 }
@@ -63,6 +64,7 @@ QFrame#deviceSide,
 QWidget#scriptSideContent,
 QWidget#deviceSideContent,
 QScrollArea#scriptScrollArea,
-QScrollArea#deviceScrollArea {
+QScrollArea#deviceScrollArea,
+QFrame#serverOfflineBase {
     background-color: #24282c;
 }
