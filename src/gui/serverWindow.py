@@ -36,6 +36,8 @@ class ServerWindow(QMainWindow):
         # Connect buttons
         self.ui.runBtn.clicked.connect(self.runServer)
         self.ui.stopBtn.clicked.connect(self.stopServer)
+        self.ui.refreshBtn.clicked.connect(self.updateOutput)
+        self.ui.refreshRateInput.valueChanged.connect(self.changeRefreshRate)
 
         self.show()
 
@@ -103,3 +105,9 @@ class ServerWindow(QMainWindow):
         Removes the server offline popover.
         """
         self.serverOfflinePopover.setVisible(False)
+
+    def changeRefreshRate(self) -> None:
+        """
+        Changes the refresh rate of the server output.
+        """
+        self.timer.setInterval(self.ui.refreshRateInput.value())
