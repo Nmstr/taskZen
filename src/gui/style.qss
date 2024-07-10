@@ -1,6 +1,7 @@
 #HomeWindow,
 #ScriptWindow,
-#DeviceWindow {
+#DeviceWindow,
+#ServerWindow {
     background-color: #1b1e20;
 }
 
@@ -37,28 +38,33 @@ EntryWidget:hover {
 }
 
 QFrame#scriptInputFrame,
-QFrame#deviceInputFrame {
+QFrame#deviceInputFrame,
+QFrame#serverOutputFrame,
+QLineEdit#commandInput {
     background-color: #202429;
 }
 
 QFrame#deviceInputFrame,
 QFrame#scriptInputFrame,
+QFrame#serverOutputFrame,
 QFrame#side,
 EntryWidget,
 QFrame#scriptSide,
 QFrame#deviceSide,
-QFrame#topBar {
+QFrame#topBar,
+QFrame#serverOfflineBase {
     border: 1px solid #202327;
     border-radius: 10px;
 }
 
+QFrame#topBar,
 QFrame#side,
 QFrame#scriptSide,
 QFrame#deviceSide,
-QFrame#topBar,
 QWidget#scriptSideContent,
 QWidget#deviceSideContent,
 QScrollArea#scriptScrollArea,
-QScrollArea#deviceScrollArea {
+QScrollArea#deviceScrollArea,
+QFrame#serverOfflineBase {
     background-color: #24282c;
 }

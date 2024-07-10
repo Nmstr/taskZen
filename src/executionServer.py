@@ -128,7 +128,7 @@ async def handleClient(reader: asyncio.StreamReader, writer: asyncio.StreamWrite
 
     print(message)
     if message['instruction'] == 'ping':
-        await sendMessage('end', writer=writer)
+        pass
 
     elif message['instruction'] == 'kill':
         await sendMessage('end', writer=writer)
@@ -173,6 +173,7 @@ async def main() -> None:
         if os.path.exists(SOCKET_PATH):
             raise
     server = await asyncio.start_unix_server(handleClient, SOCKET_PATH)
+    print(f'Server started')
 
     async with server: # Serve until done
         await server.serve_forever()

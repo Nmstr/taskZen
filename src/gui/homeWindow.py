@@ -5,9 +5,17 @@ from PySide6.QtCore import QFile
 from homeDisplay.entryWidget import EntryWidget
 from scriptWindow import ScriptWindow
 from deviceWindow import DeviceWindow
+from serverWindow import ServerWindow
 
 import yaml
 import os
+
+import sys
+from pathlib import Path
+current_dir = Path(__file__).parent
+project_root = current_dir.parent
+sys.path.append(str(project_root))
+from functions.checkDirs import checkDirs
 
 class HomeWindow(QMainWindow):
     def __init__(self):
@@ -31,6 +39,7 @@ class HomeWindow(QMainWindow):
         # Connect buttons
         self.ui.createScriptBtn.clicked.connect(lambda: ScriptWindow(self))
         self.ui.createDeviceBtn.clicked.connect(lambda: DeviceWindow(self))
+        self.ui.manageServerBtn.clicked.connect(lambda: ServerWindow(self))
         self.ui.refreshBtn.clicked.connect(self.refreshEntries)
 
         self.refreshEntries()
@@ -75,6 +84,7 @@ class HomeWindow(QMainWindow):
                     self.ui.deviceSideContent.setFixedHeight(self.ui.deviceSideContent.height() + 75)
 
 if __name__ == "__main__":
+    checkDirs()
     app = QApplication([])
     homeWindow = HomeWindow()
     homeWindow.show()
