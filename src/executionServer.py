@@ -128,7 +128,7 @@ async def handleClient(reader: asyncio.StreamReader, writer: asyncio.StreamWrite
 
     print(message)
     if message['instruction'] == 'ping':
-        await sendMessage('end', writer=writer)
+        pass
 
     elif message['instruction'] == 'kill':
         await sendMessage('end', writer=writer)
