@@ -2,6 +2,23 @@ from functions.sendInstruction import sendInstruction
 import json
 import os
 
+def pingServer() -> tuple[bool, str]:
+    """
+    Pings the execution server.
+
+    Returns:
+        tuple[bool, str]: A tuple containing a boolean indicating whether the server was pinged and a string
+        indicating the status of the server.
+    """
+    try:
+        instruction = {
+            'instruction': 'ping'
+        }
+        sendInstruction(json.dumps(instruction))
+        return True, 'Pinged successfully'
+    except (ConnectionRefusedError, FileNotFoundError):
+        return False, 'Server not running'
+
 def startServer() -> tuple[bool, str]:
     """
     Starts the execution server.
@@ -10,13 +27,9 @@ def startServer() -> tuple[bool, str]:
         tuple[bool, str]: A tuple containing a boolean indicating whether the server was started and a string
         indicating the status of the server.
     """
-    try:
-        instruction = {
-            'instruction': 'ping'
-        }
-        sendInstruction(json.dumps(instruction))
+    if pingServer()[0]:
         return False, 'Server already running'
-    except (ConnectionRefusedError, FileNotFoundError):
+    else:
         from subprocess import DEVNULL
         import subprocess
         currentPath = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
