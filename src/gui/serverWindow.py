@@ -52,14 +52,23 @@ class ServerWindow(QMainWindow):
             self.removeServerOffline()
 
     def runServer(self):
+        """
+        Starts the server.
+        """
         startServer()
         self.removeServerOffline()
 
     def stopServer(self):
+        """
+        Stops the server.
+        """
         stopServer()
         self.showServerOffline()
 
     def updateOutput(self) -> None:
+        """
+        Updates the server output.
+        """
         logFile = os.getenv('XDG_CACHE_HOME', default=os.path.expanduser('~/.cache')) + '/taskZen/server.log'
         with open(logFile, 'r') as f:
             # Calculate new scroll bar position

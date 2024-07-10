@@ -2,6 +2,9 @@ import shutil
 import os
 
 def checkDirs() -> None:
+    """
+    Creates necessary directories. Also copies example scripts and devices.
+    """
     # Handle config
     configDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/'
     os.makedirs(configDir, exist_ok=True)
