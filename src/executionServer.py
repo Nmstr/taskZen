@@ -173,6 +173,7 @@ async def main() -> None:
         if os.path.exists(SOCKET_PATH):
             raise
     server = await asyncio.start_unix_server(handleClient, SOCKET_PATH)
+    print(f'Server started')
 
     async with server: # Serve until done
         await server.serve_forever()
