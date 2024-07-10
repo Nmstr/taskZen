@@ -2,7 +2,6 @@ from PySide6.QtWidgets import QMainWindow, QWidget
 from PySide6.QtCore import QFile, QTimer
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtGui import QTextCursor
-from PySide6.QtCore import QPoint
 
 from serverGui.serverOffline import ServerOffline
 
@@ -38,6 +37,7 @@ class ServerWindow(QMainWindow):
         self.ui.stopBtn.clicked.connect(self.stopServer)
         self.ui.refreshBtn.clicked.connect(self.updateOutput)
         self.ui.refreshRateInput.valueChanged.connect(self.changeRefreshRate)
+        self.ui.commandInput.returnPressed.connect(self.runCommand)
 
         self.show()
 
@@ -111,3 +111,32 @@ class ServerWindow(QMainWindow):
         Changes the refresh rate of the server output.
         """
         self.timer.setInterval(self.ui.refreshRateInput.value())
+
+    def runCommand(self) -> None:
+        """
+        Runs a command.
+        """
+        command = self.ui.commandInput.text()
+        self.ui.commandInput.clear()
+        args = command.split()
+
+        currentPath = f'{os.path.dirname(os.path.realpath(__file__))}'
+        if 'FLATPAK_ID' in os.environ:
+            pythonExecutable = "/usr/bin/python"
+        else:
+            pythonExecutable = os.path.join(os.getenv('VIRTUAL_ENV', ''), 'bin/python')
+
+        from subprocess import DEVNULL
+        import subprocess
+        subprocess.Popen([pythonExecutable, f'{currentPath}/../main.py'] + args,
+            start_new_session=True,
+            stdout=DEVNULL,
+            stderr=DEVNULL,
+            stdin=DEVNULL,
+            cwd=os.path.dirname(currentPath),
+        )
+
+        if command == 'server -s':
+            self.removeServerOffline()
+        elif command == 'server -k':
+            self.showServerOffline()

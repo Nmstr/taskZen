@@ -138,6 +138,9 @@
       </item>
       <item>
        <widget class="QLineEdit" name="commandInput">
+        <property name="placeholderText">
+         <string>Command</string>
+        </property>
         <property name="clearButtonEnabled">
          <bool>false</bool>
         </property>
