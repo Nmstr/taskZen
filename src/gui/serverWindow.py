@@ -46,6 +46,8 @@ class ServerWindow(QMainWindow):
         self.updateOutput()
 
         self.createServerOffline()
+        if pingServer()[0]:
+            self.removeServerOffline()
 
     def runServer(self):
         print(startServer())
