@@ -24,7 +24,7 @@ class ScriptRunner(QObject):
             else:
                 pythonExecutable = os.path.join(os.getenv('VIRTUAL_ENV', ''), 'bin/python')
 
-            process = subprocess.Popen([pythonExecutable, f'{currentPath}/../main.py', 'execute', '-fvy', self.filepath],
+            process = subprocess.Popen([pythonExecutable, f'{currentPath}/../main.py', 'execute', '-fv', self.filepath],
                                        stdout=slave_fd, stderr=subprocess.STDOUT, stdin=slave_fd, close_fds=True)
             os.close(slave_fd)
 
