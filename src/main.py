@@ -20,7 +20,6 @@ def main() -> None:
     parserAdd.add_argument('name', help='name of the script to execute')
     parserAdd.add_argument('-f', '--file', action='store_true', help='Use file path instead of name')
     parserAdd.add_argument('-v', '--verbose', action='store_true', help='Make the output verbose')
-    parserAdd.add_argument('-y', '--yes', action='store_true', help='Answer yes to all prompts')
     parserAdd.add_argument('-k', '--kill', action='store_true', help='Kill the running script')
 
     parserList = subparsers.add_parser('list', aliases=['ls'], help='list all scripts')
@@ -67,27 +66,12 @@ def main() -> None:
         # Load the data
         scriptData = readScript(scriptPath)
 
-        allowExec = False
-        if scriptContainsExec(scriptData):
-            print('Script contains an exec command. Are you sure you want to execute it?')
-            print('These scripts may be unsafe. Use it at your own risk.')
-            if not args.yes:
-                result = input('Type "YES" to continue: ')
-                if result == 'YES':
-                    allowExec = True
-                else:
-                    print('Aborting.')
-                    exit(1)
-            else:
-                allowExec = True
-
         try:
             instruction = {
                 'instruction': 'execute',
                 'scriptName': args.name,
                 'file': args.file,
-                'verbose': args.verbose,
-                'allowExec': allowExec
+                'verbose': args.verbose
             }
             sendInstruction(json.dumps(instruction))
         except (ConnectionRefusedError, FileNotFoundError):

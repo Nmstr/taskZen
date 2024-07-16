@@ -41,7 +41,7 @@ async def sendMessage(message: str, requireVerbose: bool = False, *, writer: asy
 
     await writer.drain()
 
-async def processInstruction(scriptName: str, *, writer: asyncio.StreamWriter, file: bool = False, allowExec: bool = False) -> None:
+async def processInstruction(scriptName: str, *, writer: asyncio.StreamWriter, file: bool = False) -> None:
     """
     Processes an instruction to execute a script.
     Asumes that the script exists. This should have been verified by the client.
@@ -51,7 +51,6 @@ async def processInstruction(scriptName: str, *, writer: asyncio.StreamWriter, f
         writer (asyncio.StreamWriter): The writer to send messages to.
         file (bool, optional): Whether to use script name or file path. Defaults to False.
         verbose (bool, optional): Whether to print verbose messages. Defaults to False.
-        allowExec (bool, optional): Whether to allow execution of exec statements. Defaults to False.
 
     Returns:
         None
@@ -72,7 +71,7 @@ async def processInstruction(scriptName: str, *, writer: asyncio.StreamWriter, f
         return
     await sendMessage(f'Device initialized.', writer=writer)
 
-    executer = Executer(sendMessageFunction=sendMessage, writer=writer, ui=ui, allKeys=allKeys, allowExec=allowExec)
+    executer = Executer(sendMessageFunction=sendMessage, writer=writer, ui=ui, allKeys=allKeys)
     runningExecutions[scriptName] = {'executer': executer, 'creationTime': datetime.datetime.now()}
     await executer.execute(scriptData)
     runningExecutions.pop(scriptName)
@@ -150,7 +149,7 @@ async def handleClient(reader: asyncio.StreamReader, writer: asyncio.StreamWrite
         global verbose
         verbose = message['verbose']
 
-        await processInstruction(message['scriptName'], writer=writer, file=message['file'], allowExec=message['allowExec'])
+        await processInstruction(message['scriptName'], writer=writer, file=message['file'])
 
     # Close the connection
     await sendMessage(f'end', writer=writer)

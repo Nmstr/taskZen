@@ -3,7 +3,7 @@ import subprocess
 import asyncio
 
 class Executer:
-    def __init__(self, *, sendMessageFunction, writer, ui, allKeys: dict, allowExec: bool = False) -> None:
+    def __init__(self, *, sendMessageFunction, writer, ui, allKeys: dict) -> None:
         """
         Initialize the executer
         
@@ -12,14 +12,12 @@ class Executer:
             - writer (asyncio.StreamWriter): The writer
             - ui (evdev.InputDevice): The input device
             - allKeys (dict): A dictionary of all keys
-            - allowExec (bool, optional): Whether to allow execution. Defaults to False.
         """
         self.writer = writer
         self.sendMessage = staticmethod(sendMessageFunction)
         self.scriptData = None
         self.ui = ui
         self.allKeys = allKeys
-        self.allowExec = allowExec
         self.executionSpeed = None
         self.stopFlag = False
 
@@ -107,22 +105,6 @@ class Executer:
         self.ui.write(e.EV_REL, e.REL_Y, y)
         self.ui.syn()
     
-    async def actionExec(self, command: list, blocking: bool = False) -> None:
-        """
-        Execute the specified command
-        
-        Parameters:
-            - command (list): The command to execute
-            - blocking (bool, optional): Whether to block the thread. Defaults to False.
-        """
-        command = await self.retrieveValue(command)
-        blocking = await self.retrieveValue(blocking)
-
-        if blocking:
-            subprocess.call(command)
-        else:
-            subprocess.Popen(command)
-
     async def actionModifyVariable(self, variable: str, operation: str, value) -> None:
         """
         Modify a variable
@@ -196,9 +178,6 @@ class Executer:
             await self.actionMoveAbsolute(step['x'], step['y'])
         elif step['type'] == 'move-relative':
             await self.actionMoveRelative(step['x'], step['y'])
-        elif step['type'] == 'exec':
-            if self.allowExec:
-                await self.actionExec(step['value'].split(), step.get('blocking', False))
         elif step['type'] == 'modify-variable':
             await self.actionModifyVariable(step['variable'], step['operation'], step['value'])
         elif step['type'] == 'loop':
