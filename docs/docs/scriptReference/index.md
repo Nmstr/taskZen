@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: page
 title: Script Reference
 nav_order: 700
 has_children: true
