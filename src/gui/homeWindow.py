@@ -5,7 +5,6 @@ from PySide6.QtCore import QFile
 from homeDisplay.entryWidget import EntryWidget
 from scriptWindow import ScriptWindow
 from deviceWindow import DeviceWindow
-from serverWindow import ServerWindow
 
 import yaml
 import os
@@ -39,7 +38,6 @@ class HomeWindow(QMainWindow):
         # Connect buttons
         self.ui.createScriptBtn.clicked.connect(lambda: ScriptWindow(self))
         self.ui.createDeviceBtn.clicked.connect(lambda: DeviceWindow(self))
-        self.ui.manageServerBtn.clicked.connect(lambda: ServerWindow(self))
         self.ui.refreshBtn.clicked.connect(self.refreshEntries)
 
         self.refreshEntries()
@@ -62,10 +60,20 @@ class HomeWindow(QMainWindow):
             self.ui.deviceSideContent.setFixedHeight(self.ui.deviceSideContent.height() - 75)
 
         configDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config'))
-        self.loadEntries('scripts', f'{configDir}/taskZen/scripts')
-        self.loadEntries('devices', f'{configDir}/taskZen/devices')
+        self.loadScriptEntries(f'{configDir}/taskZen/scripts')
+        self.loadDeviceEntries(f'{configDir}/taskZen/devices')
 
-    def loadEntries(self, target, directory) -> None:
+    def loadScriptEntries(self, directory) -> None:
+        for filename in os.listdir(os.path.expanduser(directory)):
+            if filename.endswith(".py"):
+                filepath = os.path.expanduser(f"{directory}/{filename}")
+                entryName = os.path.splitext(filename)[0]
+
+                scriptEntry = EntryWidget(self, 'scripts', entryName, filepath)
+                self.ui.scriptSideContent.layout().addWidget(scriptEntry)
+                self.ui.scriptSideContent.setFixedHeight(self.ui.scriptSideContent.height() + 75)
+
+    def loadDeviceEntries(self, directory) -> None:
         for filename in os.listdir(os.path.expanduser(directory)):
             if filename.endswith(".yaml"):
                 filepath = os.path.expanduser(f"{directory}/{filename}")
@@ -75,13 +83,9 @@ class HomeWindow(QMainWindow):
                 else:
                     entryName = 'Unnamed'
 
-                scriptEntry = EntryWidget(self, target, entryName, filepath)
-                if target == 'scripts':
-                    self.ui.scriptSideContent.layout().addWidget(scriptEntry)
-                    self.ui.scriptSideContent.setFixedHeight(self.ui.scriptSideContent.height() + 75)
-                elif target == 'devices':
-                    self.ui.deviceSideContent.layout().addWidget(scriptEntry)
-                    self.ui.deviceSideContent.setFixedHeight(self.ui.deviceSideContent.height() + 75)
+                scriptEntry = EntryWidget(self, 'devices', entryName, filepath)
+                self.ui.deviceSideContent.layout().addWidget(scriptEntry)
+                self.ui.deviceSideContent.setFixedHeight(self.ui.deviceSideContent.height() + 75)
 
 if __name__ == "__main__":
     checkDirs()

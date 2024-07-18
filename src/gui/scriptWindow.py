@@ -24,7 +24,7 @@ class ScriptRunner(QObject):
             else:
                 pythonExecutable = os.path.join(os.getenv('VIRTUAL_ENV', ''), 'bin/python')
 
-            process = subprocess.Popen([pythonExecutable, f'{currentPath}/../main.py', 'execute', '-fv', self.filepath],
+            process = subprocess.Popen([pythonExecutable, f'{currentPath}/../main.py', 'execute', '-f', self.filepath],
                                        stdout=slave_fd, stderr=subprocess.STDOUT, stdin=slave_fd, close_fds=True)
             os.close(slave_fd)
 
@@ -82,7 +82,7 @@ class ScriptWindow(QMainWindow):
             else:
                 defaultPath = os.path.expanduser('~/.config/taskZen/scripts/')
 
-            self.filepath, _ = QFileDialog.getSaveFileName(self, "Save Script", defaultPath, "Yaml Files (*.yaml)")
+            self.filepath, _ = QFileDialog.getSaveFileName(self, "Save Script", defaultPath, "Python Files (*.py)")
             if self.filepath == '':
                 return
 

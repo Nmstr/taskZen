@@ -73,20 +73,3 @@ def readScript(scriptPath: str) -> dict:
         scriptData = yaml.safe_load(file)
     
     return scriptData
-
-def findScript(scriptName: str) -> str:
-    """
-    Finds the file path for any given script
-
-    Parameters:
-        - scriptName (str): The name of the script
-
-    Returns:
-        - scriptPath (str): The path to the script
-    """
-    scriptDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/scripts/'
-    for script in os.listdir(scriptDir):
-        with open(scriptDir + script, 'r') as file:
-            data = yaml.safe_load(file)
-            if data['name'] == scriptName:
-                return scriptDir + script
