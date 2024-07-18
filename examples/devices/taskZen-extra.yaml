@@ -1,6 +1,5 @@
 name: taskZen-extra
 phys: taskZen-extra
-version: 1
 
 keys:
   - KEY_RIGHTCTRL

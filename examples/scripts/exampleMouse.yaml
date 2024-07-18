@@ -1,9 +1,6 @@
 name: exampleMouse
 speed: 1
 device: taskZen-minimal
-screen:
-  width: 1920
-  height: 1080
 
 steps:
   - type: move-absolute

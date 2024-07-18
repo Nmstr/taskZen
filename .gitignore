@@ -9,3 +9,4 @@ vendor
 Gemfile.lock
 build_dir
 .flatpak-builder
+old

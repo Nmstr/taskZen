@@ -1,9 +1,6 @@
 name: exampleVar
 speed: 8
 device: taskZen-minimal
-screen:
-  width: 1920
-  height: 1080
 variables:
   distance: 1
   startPositionX: 50

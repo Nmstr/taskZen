@@ -1,4 +1,4 @@
-from initialize import readScript, findScript, scriptContainsExec
+from initialize import readScript, findScript
 from functions.sendInstruction import sendInstruction
 from functions.server import startServer, stopServer
 from functions.checkDirs import checkDirs

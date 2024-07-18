@@ -1,9 +1,6 @@
 name: exampleIf
 speed: 0
 device: taskZen-minimal
-screen:
-  width: 1920
-  height: 1080
 variables:
   distance: 2
   xPos: 50

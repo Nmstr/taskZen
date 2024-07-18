@@ -2,9 +2,6 @@ name: exampleKeyboard
 speed: 100
 device: taskZen-minimal
 device-version: 1
-screen:
-  width: 1920
-  height: 1080
 
 steps:
   - type: tap
