@@ -1,10 +1,6 @@
-from functions.sendInstruction import sendInstruction
-from functions.server import startServer, stopServer
 from functions.checkDirs import checkDirs
 
 import argparse
-import yaml
-import json
 import os
 
 def main() -> None:
@@ -29,6 +25,7 @@ def main() -> None:
         # Print help
         parser.print_help()
         exit(0)
+
 
     elif args.command in ['execute']:
         if args.file:
@@ -57,12 +54,14 @@ def main() -> None:
             env=env
         )
 
+
     elif args.command in ['list', 'ls']:
         print('\ttaskZen\nAutomation utility for Wayland\n')
         # List all scripts
         print('Available scripts:')
         for file in os.listdir(scriptDir):
             print(f'\t- {file} ({os.path.abspath(scriptDir + file)})')
+
 
     elif args.command in ['gui']:
         from subprocess import DEVNULL
