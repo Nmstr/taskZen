@@ -2,8 +2,8 @@ from evdev import UInput, ecodes as e, AbsInfo
 import yaml
 import os
 
-def initialize() -> tuple:
-    finalDevice = getFinalDevice('taskZen-minimal')
+def initialize(deviceName) -> tuple:
+    finalDevice = getFinalDevice(deviceName)
     if finalDevice is None:
         return None, 'Device not found'
 
@@ -33,6 +33,7 @@ def initialize() -> tuple:
     return device
 
 def getFinalDevice(deviceName: int) -> dict:
+    finalDevice = None
     # Find the device
     deviceDir = os.getenv('XDG_CONFIG_HOME', default=os.path.expanduser('~/.config')) + '/taskZen/devices/'
     for file in os.listdir(deviceDir):
@@ -41,6 +42,9 @@ def getFinalDevice(deviceName: int) -> dict:
             if deviceName == deviceData['name']:
                 finalDevice = deviceData
 
+    if not finalDevice:
+        print("Device not found")
+        exit(1)
     return finalDevice
 
 def getAllKeys() -> dict:

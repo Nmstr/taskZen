@@ -1,9 +1,7 @@
 import taskZen
 import time
 
-from evdev import UInput, ecodes as e, AbsInfo
-
-import time
+taskZen.registerDevice('taskZen-minimal')
 
 # Calling a function directly from taskZen
 taskZen.pressKey('KEY_A')
