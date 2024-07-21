@@ -38,22 +38,13 @@ def main() -> None:
             print(f'Script {args.name} not found.')
             exit(1)
 
-        from subprocess import DEVNULL
-        import subprocess
-        currentDir = os.path.dirname(os.path.realpath(__file__))
-        if 'FLATPAK_ID' in os.environ:
-            pythonExecutable = "/usr/bin/python"
-        else:
-            pythonExecutable = os.path.join(os.getenv('VIRTUAL_ENV', ''), 'bin/python')
-        env = os.environ.copy()
-        env['PYTHONPATH'] = currentDir + os.pathsep + env.get('PYTHONPATH', '')
-        
-        subprocess.call(
-            [pythonExecutable, scriptPath],
-            cwd=currentDir,
-            env=env
-        )
-
+        from functions.sendInstruction import sendInstruction
+        import json
+        instruction = {
+            'instruction': 'execute',
+            'path': scriptPath
+        }
+        sendInstruction(json.dumps(instruction))
 
     elif args.command in ['list', 'ls']:
         print('\ttaskZen\nAutomation utility for Wayland\n')
