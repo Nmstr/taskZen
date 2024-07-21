@@ -60,7 +60,7 @@ def main() -> None:
         # List all scripts
         print('Available scripts:')
         for file in os.listdir(scriptDir):
-            print(f'\t- {file} ({os.path.abspath(scriptDir + file)})')
+            print(f'\t- {os.path.splitext(file)[0]} ({os.path.abspath(scriptDir + file)})')
 
 
     elif args.command in ['gui']:

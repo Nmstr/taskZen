@@ -42,7 +42,7 @@ keys:
   - BTN_MOUSE
 ```
 
-Refer to the [available keys](https://nmstr.github.io/taskZen/deviceReference/availableKeys) page for a list of all available keys.
+Refer to the [available keys](../availableKeys) page for a list of all available keys.
 
 Recap:
 - 4 parts: `name`, `phys`, `version` and `keys`

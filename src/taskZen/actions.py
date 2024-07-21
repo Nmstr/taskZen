@@ -46,12 +46,12 @@ def tapKey(key: str, modifier: str = None) -> None:
         - key (str): The key to tap
         - modifier (str, optional): The modifier to use. Defaults to None.
     """
-    if modifier == 'SHIFT':
-        ui.write(e.EV_KEY, e.KEY_LEFTSHIFT, 1)
+    if modifier:
+        ui.write(e.EV_KEY, allKeys.get(modifier), 1)
     ui.write(e.EV_KEY, allKeys.get(key), 1)
     ui.write(e.EV_KEY, allKeys.get(key), 0)
-    if modifier == 'SHIFT':
-        ui.write(e.EV_KEY, e.KEY_LEFTSHIFT, 0)
+    if modifier:
+        ui.write(e.EV_KEY, allKeys.get(modifier), 0)
     ui.syn()
     
 def moveAbsolute(x: int, y: int) -> None:

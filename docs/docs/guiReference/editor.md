@@ -6,7 +6,7 @@ parent: Gui Reference
 nav_order: 200
 ---
 
-The Editor is the central part of taskZen, where you can create and edit your scripts. It consists of a text field on the right-hand side, where you write your script. To learn more about the script syntax, click [here](https://nmstr.github.io/taskZen/scriptReference).
+The Editor is the central part of taskZen, where you can create and edit your scripts. It consists of a text field on the right-hand side, where you write your script. To learn more about the script syntax, click [here](../scriptReference).
 
 On the left-hand side of the editor, there are three elements:
 
