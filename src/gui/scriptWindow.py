@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QMainWindow, QWidget, QFileDialog
 from PySide6.QtCore import QFile, QObject, Signal, QThread
 from PySide6.QtUiTools import QUiLoader
+from PySide6.QtGui import QTextCursor
 
 import subprocess
 import pty
@@ -127,5 +128,19 @@ class ScriptWindow(QMainWindow):
                                         
 
     def updateSideText(self, text):
+        # Calculate new scroll bar position
+        scrollbar = self.ui.sideText.verticalScrollBar()
+        currentPos = scrollbar.value()
+        maxPos = scrollbar.maximum()
+        threshold = scrollbar.pageStep() / 4
+        closeToBottom = (maxPos - currentPos) <= threshold
+
+        # Update the text
         self.outputText += text
         self.ui.sideText.setPlainText(self.outputText)
+
+        # Set scroll bar position
+        if closeToBottom:
+            self.ui.sideText.moveCursor(QTextCursor.End)
+        else:
+            scrollbar.setValue(currentPos)
