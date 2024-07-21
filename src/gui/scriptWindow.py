@@ -94,12 +94,6 @@ class ScriptWindow(QMainWindow):
 
     def runScript(self) -> None:
         if self.running:
-            self.updateSideText('Stopping script...\n')
-            self.ui.sideText.setText(self.outputText)
-            subprocess.run(['taskZen', 'execute', '-kf', self.filepath], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            self.updateSideText('Script stopped\n')
-            self.ui.sideText.setText(self.outputText)
-            self.setRunning(False)
             return
         self.setRunning(True)
         self.outputText = 'Running script...\n'
