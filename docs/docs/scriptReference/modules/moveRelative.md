@@ -4,12 +4,12 @@ title: Move Relative
 permalink: /scriptReference/modules/move-relative/
 parent: Modules
 grand_parent: Script Reference
-nav_order: 600
+nav_order: 500
 ---
 
 ### Move Relative
 
-The `move-relative` module moves the mouse to an position relative to the current position. It takes 2 arguments. `x` and `y`, which are the amounts units the mouse should be moved.
+The `moveRelative` module moves the mouse to a position relative to the current position. It takes 2 arguments. `x` and `y`, which are the amounts units the mouse should be moved.
 
 Parameters:
   - x: int
@@ -17,10 +17,9 @@ Parameters:
 
 Example usage:
 ```
-  - type: move-relative
-    x: 75
-    y: 150
+taskZen.moveRelative(100, 100)
 ```
 
+<br>
 Related:
   - [Move Absolute](../move-absolute/)

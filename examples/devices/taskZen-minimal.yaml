@@ -1,6 +1,5 @@
 name: taskZen-minimal
 phys: taskZen-minimal
-version: 1
 
 keys:
   - KEY_LEFTSHIFT

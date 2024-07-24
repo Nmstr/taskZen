@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QMainWindow, QWidget, QFileDialog
 from PySide6.QtCore import QFile, QObject, Signal, QThread
 from PySide6.QtUiTools import QUiLoader
+from PySide6.QtGui import QTextCursor
 
 import subprocess
 import pty
@@ -24,7 +25,7 @@ class ScriptRunner(QObject):
             else:
                 pythonExecutable = os.path.join(os.getenv('VIRTUAL_ENV', ''), 'bin/python')
 
-            process = subprocess.Popen([pythonExecutable, f'{currentPath}/../main.py', 'execute', '-fv', self.filepath],
+            process = subprocess.Popen([pythonExecutable, f'{currentPath}/../main.py', 'execute', '-f', self.filepath],
                                        stdout=slave_fd, stderr=subprocess.STDOUT, stdin=slave_fd, close_fds=True)
             os.close(slave_fd)
 
@@ -82,7 +83,7 @@ class ScriptWindow(QMainWindow):
             else:
                 defaultPath = os.path.expanduser('~/.config/taskZen/scripts/')
 
-            self.filepath, _ = QFileDialog.getSaveFileName(self, "Save Script", defaultPath, "Yaml Files (*.yaml)")
+            self.filepath, _ = QFileDialog.getSaveFileName(self, "Save Script", defaultPath, "Python Files (*.py)")
             if self.filepath == '':
                 return
 
@@ -94,12 +95,6 @@ class ScriptWindow(QMainWindow):
 
     def runScript(self) -> None:
         if self.running:
-            self.updateSideText('Stopping script...\n')
-            self.ui.sideText.setText(self.outputText)
-            subprocess.run(['taskZen', 'execute', '-kf', self.filepath], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            self.updateSideText('Script stopped\n')
-            self.ui.sideText.setText(self.outputText)
-            self.setRunning(False)
             return
         self.setRunning(True)
         self.outputText = 'Running script...\n'
@@ -133,5 +128,19 @@ class ScriptWindow(QMainWindow):
                                         
 
     def updateSideText(self, text):
+        # Calculate new scroll bar position
+        scrollbar = self.ui.sideText.verticalScrollBar()
+        currentPos = scrollbar.value()
+        maxPos = scrollbar.maximum()
+        threshold = scrollbar.pageStep() / 4
+        closeToBottom = (maxPos - currentPos) <= threshold
+
+        # Update the text
         self.outputText += text
         self.ui.sideText.setPlainText(self.outputText)
+
+        # Set scroll bar position
+        if closeToBottom:
+            self.ui.sideText.moveCursor(QTextCursor.End)
+        else:
+            scrollbar.setValue(currentPos)

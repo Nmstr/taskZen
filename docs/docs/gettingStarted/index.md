@@ -21,9 +21,9 @@ $ taskZen ls
 Automation utility for Wayland
 
 Available scripts:
-        - exampleExec (/home/user/.config/taskZen/exampleExec.yaml)
-        - exampleKeyboard (/home/user/.config/taskZen/exampleKeyboard.yaml)
-        - exampleMouse (/home/user/.config/taskZen/exampleMouse.yaml)
+        - exampleExec (/home/user/.config/taskZen/scripts/exampleExec.py)
+        - exampleKeyboard (/home/user/.config/taskZen/scripts/exampleKeyboard.py)
+        - exampleMouse (/home/user/.config/taskZen/scripts/exampleMouse.py)
 ```
 
 ## Execute a script
@@ -34,8 +34,8 @@ To run "exampleKeyboard" type `taskZen execute exampleKeyboard` into your termin
 
 You can also use the -f flag to select the script by path instead of by name.
 
-To run "exampleKeybard" by path type `taskZen execute -f /home/user/.config/taskZen/exampleKeyboard.yaml` into your terminal.
+To run "exampleKeybard" by path type `taskZen execute -f /home/user/.config/taskZen/scripts/exampleKeyboard.py` into your terminal.
 
 ## Creating your first script
 
-For a guide on how to create your first script vistis [this](https://nmstr.github.io/taskZen/firstScript) page.
+For a guide on how to create your first script vistis [this](../firstScript) page.
