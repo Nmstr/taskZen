@@ -8,13 +8,11 @@ allKeys = None
 executionSpeed = None
 stopFlag = False
 
-def setVariables(uiValue, allKeysValue) -> None:
-    global ui
+def setVariables(deviceValue, allKeysValue) -> None:
     global allKeys
     global device
 
-    ui = uiValue
-    device = uiValue
+    device = deviceValue
     allKeys = allKeysValue
 
 def pressKey(key: str) -> None:
@@ -24,8 +22,8 @@ def pressKey(key: str) -> None:
     Parameters:
         - key (str): The key to press
     """
-    ui.write(e.EV_KEY, allKeys.get(key), 1)
-    ui.syn()
+    device.write(e.EV_KEY, allKeys.get(key), 1)
+    device.syn()
 
 def releaseKey(key: str) -> None:
     """
@@ -34,9 +32,9 @@ def releaseKey(key: str) -> None:
     Parameters:
         - key (str): The key to release
     """
-    ui.write(e.EV_KEY, allKeys.get(key), 1)
-    ui.write(e.EV_KEY, allKeys.get(key), 0)
-    ui.syn()
+    device.write(e.EV_KEY, allKeys.get(key), 1)
+    device.write(e.EV_KEY, allKeys.get(key), 0)
+    device.syn()
 
 def tapKey(key: str, modifier: str = None) -> None:
     """
@@ -47,12 +45,12 @@ def tapKey(key: str, modifier: str = None) -> None:
         - modifier (str, optional): The modifier to use. Defaults to None.
     """
     if modifier:
-        ui.write(e.EV_KEY, allKeys.get(modifier), 1)
-    ui.write(e.EV_KEY, allKeys.get(key), 1)
-    ui.write(e.EV_KEY, allKeys.get(key), 0)
+        device.write(e.EV_KEY, allKeys.get(modifier), 1)
+    device.write(e.EV_KEY, allKeys.get(key), 1)
+    device.write(e.EV_KEY, allKeys.get(key), 0)
     if modifier:
-        ui.write(e.EV_KEY, allKeys.get(modifier), 0)
-    ui.syn()
+        device.write(e.EV_KEY, allKeys.get(modifier), 0)
+    device.syn()
     
 def moveAbsolute(x: int, y: int) -> None:
     """
@@ -74,6 +72,6 @@ def moveRelative(x: int, y: int) -> None:
         - x (int): The x coordinate
         - y (int): The y coordinate
     """
-    ui.write(e.EV_REL, e.REL_X, x)
-    ui.write(e.EV_REL, e.REL_Y, y)
-    ui.syn()
+    device.write(e.EV_REL, e.REL_X, x)
+    device.write(e.EV_REL, e.REL_Y, y)
+    device.syn()
